@@ -1,0 +1,13 @@
+# <img src="https://coursesandconferences.wellcomeconnectingscience.org/wp-content/themes/wcc_courses_and_conferences/dist/assets/svg/logo.svg" width="200" height="200">
+
+# Cancer Genome Analysis - Latin America and the Caribbean: 26 November to 1 December 2023
+
+Learn to analyse genomics data from cancer samples with hands-on practical exercises in mutation calling, driver gene identification, mutational signature analysis and RNA deconvolution.
+
+## Course Overview
+
+Cancer is one of the leading causes of death in the world. In Latin America, 1.5 million cases and over 0.7 million deaths were reported in 2020. Its burden and outcome are influenced by baseline genetics, as well as different environmental factors, that vary across human populations. These factors leave specific footprints in the genome of cells, which can be studied through bioinformatics approaches. However, studies on cancer genetic susceptibility and interventions are largely based in the Global North, resulting in disproportionate representation of Latin American datasets and research. Therefore, there is an urgent need to address the widening global disparities in cancer genomics research to include more global populations. 
+
+This new course will provide Latin America-based scientists with the requisite skills in processing, analysing, and interpreting data from cancer genomes. Participants will be equipped with the essential informatics skills and knowledge required to begin analysing next generation sequencing data and carry out some of the most common types of analysis in somatic genome studies.  Participants will benefit from hands-on practical exercises in mutation calling, driver gene identification, mutational signature analysis and RNA deconvolution. By analysing real-world datasets, students will gain valuable skills that they can later apply at their institutions. Guest seminars will highlight translational applications of genomics in oncology, ethical aspects, and data platforms. This will contribute directly to the much-needed capacity building for cancer research, and scientists will be able to strengthen the application of genomics in clinical practice, public health and policy needs. 
+
+The course will be led by experts in cancer genomics from Latin America and the USA. 
