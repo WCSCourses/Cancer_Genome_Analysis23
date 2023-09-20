@@ -12,6 +12,21 @@ This new course will provide Latin America-based scientists with the requisite s
 
 The course will be led by experts in cancer genomics from Latin America and the USA. 
 
+## Training Team
+
+- [Daniela Robles-Espinoza](http://www.liigh.unam.mx/drobles), LIIGH-UNAM, Mexico
+- [Patricia Basurto Losada](https://liigh.unam.mx/drobles/index.php/members/), LIIGH-UNAM, Mexico
+- [Mariana Boroni][https://www.gov.br/inca/pt-br/assuntos/pesquisa/pesquisa-basica-e-experimental/bioinformatica-e-biologia-computacional], iNCA, Brazil
+- [Nyasha Chambwe](https://feinstein.northwell.edu/institutes-researchers/our-researchers/nyasha-chambwe-phd), Feinstein Institutes for Medical Research, USA
+- [Santiago Chávez](http://www.genetica.fmed.edu.uy/integrantes), Universidad de la República, Uruguay
+- [Leandro Colli](http://lto.fmrp.usp.br/), University of São Paulo, Brazil
+- [eric Dawson](https://www.erictdawson.com/), Nvidia, USA
+- [Marcos Díaz-Gay](https://marcos-diazg.github.io/), UCSD, USA
+- [Mariano Golubicki](https://golubicki.github.io/), Hospital Udoanod - IATTGI, Argentina
+- [Andrés Iriarte](https://higiene.edu.uy/ddbp/lbc/en/), Universidad de la República, Uruguay
+- [Cecilia Mathó](http://www.genetica.fmed.edu.uy/integrantes), Universidad de la República, Uruguay
+- [Lucia Spangenberg](https://scholar.google.com/citations?user=V0zb3pYAAAAJ), Institut Pasteur de Mondevideo, Uruguay
+
 Shield: [![CC BY 4.0][cc-by-shield]][cc-by]
 
 This work is licensed under a
