@@ -11,3 +11,15 @@ Cancer is one of the leading causes of death in the world. In Latin America, 1.5
 This new course will provide Latin America-based scientists with the requisite skills in processing, analysing, and interpreting data from cancer genomes. Participants will be equipped with the essential informatics skills and knowledge required to begin analysing next generation sequencing data and carry out some of the most common types of analysis in somatic genome studies.  Participants will benefit from hands-on practical exercises in mutation calling, driver gene identification, mutational signature analysis and RNA deconvolution. By analysing real-world datasets, students will gain valuable skills that they can later apply at their institutions. Guest seminars will highlight translational applications of genomics in oncology, ethical aspects, and data platforms. This will contribute directly to the much-needed capacity building for cancer research, and scientists will be able to strengthen the application of genomics in clinical practice, public health and policy needs. 
 
 The course will be led by experts in cancer genomics from Latin America and the USA. 
+
+Shield: [![CC BY 4.0][cc-by-shield]][cc-by]
+
+This work is licensed under a
+[Creative Commons Attribution 4.0 International License][cc-by].
+
+[![CC BY 4.0][cc-by-image]][cc-by]
+
+[cc-by]: http://creativecommons.org/licenses/by/4.0/
+[cc-by-image]: https://i.creativecommons.org/l/by/4.0/88x31.png
+[cc-by-shield]: https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg
+
