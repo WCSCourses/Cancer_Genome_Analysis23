@@ -1,7 +1,6 @@
-Mutational Signature Analysis
-================
-Marcos Díaz-Gay
-2023-11-13
+# Mutational Signature Analysis
+Marcos Díaz-Gay & Mariano Golubicki
+2023-11-17
 
 <!-- Standard knitr setup with labsheet package loading -->
 <!-- Track Correct Student Responses -->
@@ -9,7 +8,7 @@ Marcos Díaz-Gay
 
 # Background
 
-<img style="float: right; height: 650px; margin-left: 20px" src=data/landing_page_diagram_DKTkPUW.width-450.jpegquality-60.png>
+<img src="data/landing_page_diagram_DKTkPUW.width-450.jpegquality-60.png" style="float: right; height: 650px; margin-left: 20px"/>
 
 The goal of this hands-on practical session is to perform a mutational
 signature analysis of a set of cancer patients and decipher the
@@ -33,8 +32,8 @@ generate unique combinations of mutation types, termed **mutational
 signatures**.
 
 To perform mutational signature analysis, we will be using the
-**[SigProfiler](https://cancer.sanger.ac.uk/signatures/tools/) suite of
-tools**. SigProfiler provides a comprehensive and integrated suite of
+[**SigProfiler**](https://cancer.sanger.ac.uk/signatures/tools/) **suite
+of tools**. SigProfiler provides a comprehensive and integrated suite of
 bioinformatic tools for performing mutational signature analysis. The
 software covers the analytical lifecycle starting with the generation of
 the mutational matrices
@@ -100,7 +99,9 @@ cBioPortal and answer the questions below.
 - **Q3.** Which is the most common treatment undergone by patients?
   <input class='solveme nospaces ignorecase' size='12' data-answer='["FU","5FU","Fluorouracil"]'/>”
 
-<div class="solution">
+<div class="solution proof">
+
+<span class="proof-title">*Solution*. </span>
 
 <button>
 More details
@@ -122,7 +123,7 @@ present in the virtual machine. In case you want to download any cancer
 sequencing data from cBioPortal in the future for your own analysis, you
 should use the following button within the `Summary` panel.
 
-> **Side-note: **The code presented below was built to run the analysis
+> **Side-note:** The code presented below was built to run the analysis
 > on the colorectal adenocarcinomas cohort. In case you want to perform
 > mutational analysis in other cohorts or for your own projects, you
 > will have to adapt it for your specific analysis.
@@ -154,16 +155,16 @@ collection of packages as follows:
 library(tidyverse)
 ```
 
-    ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-    ## ✔ dplyr     1.1.3     ✔ readr     2.1.4
-    ## ✔ forcats   1.0.0     ✔ stringr   1.5.0
-    ## ✔ ggplot2   3.4.4     ✔ tibble    3.2.1
-    ## ✔ lubridate 1.9.2     ✔ tidyr     1.3.0
-    ## ✔ purrr     1.0.2     
-    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-    ## ✖ dplyr::filter() masks stats::filter()
-    ## ✖ dplyr::lag()    masks stats::lag()
-    ## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+    ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+    ✔ dplyr     1.1.3     ✔ readr     2.1.4
+    ✔ forcats   1.0.0     ✔ stringr   1.5.0
+    ✔ ggplot2   3.4.4     ✔ tibble    3.2.1
+    ✔ lubridate 1.9.2     ✔ tidyr     1.3.0
+    ✔ purrr     1.0.2     
+    ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+    ✖ dplyr::filter() masks stats::filter()
+    ✖ dplyr::lag()    masks stats::lag()
+    ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
 
 ``` r
 # Read cBioPortal style MAF file
@@ -198,7 +199,7 @@ write.table(maf_sp, 'signatures/SPMG/data_mutations.maf', quote = F,
 
 # 3. Generating mutational matrices
 
-<img style="float: right; height: 90px; margin: 20px" src="data/SigProfilerMatrixGenerator.png">
+<img src="data/SigProfilerMatrixGenerator.png" style="float: right; height: 90px; margin: 20px"/>
 
 Benefiting from the standard MAF format file we have generated, we can
 now use the **SigProfilerMatrixGenerator** package to manage this
@@ -285,14 +286,14 @@ inside the `SPMG` directory.
 
 # 4. Visualizing mutational profiles
 
-<img style="float: right; height: 90px; margin: 20px" src="data/SigProfilerPlotting.png">
+<img src="data/SigProfilerPlotting.png" style="float: right; height: 90px; margin: 20px"/>
 
 For the **visualization of SBS96 mutational profiles**, we will make use
 of the **SigProfilerPlotting** tool. To generate mutational profile
 plots, we will use the previously generated mutational matrices as
 input.
 
-> **Side-note: **Although SigProfilerMatrixGenertor also allows users to
+> **Side-note:** Although SigProfilerMatrixGenertor also allows users to
 > directly generate mutational profile plots, this is quite time
 > consuming, as plots are generated for every different SBS
 > classification (as well as for every sample).
@@ -326,7 +327,7 @@ first obtain the relative mutational matrix, using percentages instead
 of absolute values. This step is required to avoid samples with high
 numbers of mutations to bias the average mutational profile.
 
-> **Side-note: **You can try to see what happens if you generate the
+> **Side-note:** You can try to see what happens if you generate the
 > average mutational profile directly with the absolute values instead
 > of the relative ones. Can you observe any significant difference? Why
 > do you think this happens?
@@ -445,7 +446,9 @@ questions below.
   `COAD_GS`, `COAD_MSI`, and `COAD_POLE` subgroups, and compare them
   agains the one previously done for `COAD_CIN`.
 
-<div class="solution">
+<div class="solution proof">
+
+<span class="proof-title">*Solution*. </span>
 
 <button>
 Hint
@@ -467,7 +470,7 @@ the `COAD_CIN` subgroup?
 
 # 5. Extracting mutational signatures
 
-<img style="float: right; height: 90px; margin: 20px" src="data/SigProfilerExtractor.png">
+<img src="data/SigProfilerExtractor.png" style="float: right; height: 90px; margin: 20px"/>
 
 In order to perform extraction of mutational signatures, we are going to
 use **SigProfilerExtractor**, the associated tool from the SigProfiler
@@ -475,7 +478,7 @@ suite. We will use it to **extract *de novo* mutational signatures**
 from a set of samples and decompose the *de novo* extracted signatures
 into COSMIC reference signatures.
 
-> **Side-note: **It is also possible to run SigProfilerExtractor
+> **Side-note:** It is also possible to run SigProfilerExtractor
 > directly from MAF (or VCF) files, without generating a mutational
 > matrix first. In this case, we need to change the `input_type`
 > parameter to `vcf`. What is going to happen is that
@@ -493,17 +496,17 @@ To load the package you can use:
 library(SigProfilerExtractorR)
 ```
 
-    ## 
-    ## Attaching package: 'SigProfilerExtractorR'
 
-    ## The following object is masked from 'package:SigProfilerMatrixGeneratorR':
-    ## 
-    ##     install
+    Attaching package: 'SigProfilerExtractorR'
+
+    The following object is masked from 'package:SigProfilerMatrixGeneratorR':
+
+        install
 
 To run `SigProfilerExtractor` in our colorectal cancer cohort you can
 use the code below:
 
-> **Side-note: **We are setting nmf_replicates = 3 and
+> **Side-note:** We are setting nmf_replicates = 3 and
 > maximum_signatures = 3 to decrease how long the command takes to run.
 > **For accurate results, you will need to increase those parameters**
 > (e.g., the default and recommended values are nmf_replicates = 100 and
@@ -612,7 +615,7 @@ questions below:
 
 # 7. Assigning reference mutational signatures
 
-<img style="float: right; height: 90px; margin: 20px" src="data/SigProfilerAssignment.png">
+<img src="data/SigProfilerAssignment.png" style="float: right; height: 90px; margin: 20px"/>
 
 Leveraging the COSMIC mutational signatures, we will perform a
 mutational signature assignment analysis to **quantify the number of
@@ -635,7 +638,7 @@ the case of our preferred SBS96 mutational context).
 
 <br>
 
-<img src="data/Screenshot 2023-03-07 at 10.34.50 PM.png">
+<img src="data/Screenshot 2023-03-07 at 10.34.50 PM.png"/>
 
 To assign reference signatures to individual samples using
 SigProfilerAssignment, you can use the code below:
@@ -687,9 +690,9 @@ ggplot(stats) +
     theme_bw()
 ```
 
-    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+    `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
-![](MS_Practical_WCSCGA2023_files/figure-gfm/cos_sim-1.png)<!-- -->
+![](MS_Practical_WCSCGA2023_files/figure-commonmark/cos_sim-1.png)
 
 ## 8.2 Visualizing signature activities from SigProfilerAssignment
 
@@ -733,7 +736,7 @@ novo* signatures.
 We can start by reviewing a similar TMB plot, which now looks quite
 different.
 
-<img style="display: block;  margin-left: auto;  margin-right: auto;  width: 50%;" src=data/COSMIC_SBS96_TMB_plot.png>
+<img src="data/COSMIC_SBS96_TMB_plot.png" style="display: block;  margin-left: auto;  margin-right: auto;  width: 50%;"/>
 
 We will now generate custom visualizations using `ggplot2` and the
 activities output matrix from the mutational signature assignment
@@ -753,15 +756,15 @@ avg_acts = colMeans(acts[,-1])
 avg_acts
 ```
 
-    ##      SBS1      SBS5    SBS10a    SBS10b     SBS15     SBS28     SBS40     SBS44 
-    ## 118.66288 133.80114  63.38068  61.90341  34.05682  17.34470  36.36174  68.67992
+         SBS1      SBS5    SBS10a    SBS10b     SBS15     SBS28     SBS40     SBS44 
+    118.66288 133.80114  63.38068  61.90341  34.05682  17.34470  36.36174  68.67992 
 
 ``` r
 # Visualize average activities per signature
 barplot(avg_acts)
 ```
 
-![](MS_Practical_WCSCGA2023_files/figure-gfm/visualization_2-1.png)<!-- -->
+![](MS_Practical_WCSCGA2023_files/figure-commonmark/visualization_2-1.png)
 
 We can also plot the activities for every sample. In this case we are
 going to plot the relative activities. If we want to plot the absolute
@@ -786,7 +789,7 @@ ggplot(acts_tidy) +
           axis.ticks.x=element_blank())
 ```
 
-![](MS_Practical_WCSCGA2023_files/figure-gfm/visualization_3-1.png)<!-- -->
+![](MS_Practical_WCSCGA2023_files/figure-commonmark/visualization_3-1.png)
 
 Since we have a lot of samples, the plot above is quite messy and not
 very useful. We will group the samples according to the metadata groups
@@ -816,7 +819,7 @@ top_10_mutated_samples %>%
           axis.ticks.x=element_blank())
 ```
 
-![](MS_Practical_WCSCGA2023_files/figure-gfm/visualization_4-1.png)<!-- -->
+![](MS_Practical_WCSCGA2023_files/figure-commonmark/visualization_4-1.png)
 
 ## 8.4 Associating signature activities with specific metadata
 
@@ -840,7 +843,7 @@ acts_and_metadata = acts_tidy %>%
     left_join(metadata)
 ```
 
-    ## Joining with `by = join_by(Sample.ID)`
+    Joining with `by = join_by(Sample.ID)`
 
 ``` r
 # Calculate average activities per subtype
@@ -849,23 +852,23 @@ acts_per_subgroup = acts_and_metadata %>%
     summarise(Avg_mutations = mean(Mutations))
 ```
 
-    ## `summarise()` has grouped output by 'Subtype'. You can override using the
-    ## `.groups` argument.
+    `summarise()` has grouped output by 'Subtype'. You can override using the
+    `.groups` argument.
 
 ``` r
 head(acts_per_subgroup)
 ```
 
-    ## # A tibble: 6 × 3
-    ## # Groups:   Subtype [1]
-    ##   Subtype  Signature Avg_mutations
-    ##   <chr>    <chr>             <dbl>
-    ## 1 COAD_CIN SBS1            60.0   
-    ## 2 COAD_CIN SBS10a           0.0708
-    ## 3 COAD_CIN SBS10b           1.59  
-    ## 4 COAD_CIN SBS15            2.29  
-    ## 5 COAD_CIN SBS28            0.261 
-    ## 6 COAD_CIN SBS40           48.1
+    # A tibble: 6 × 3
+    # Groups:   Subtype [1]
+      Subtype  Signature Avg_mutations
+      <chr>    <chr>             <dbl>
+    1 COAD_CIN SBS1            60.0   
+    2 COAD_CIN SBS10a           0.0708
+    3 COAD_CIN SBS10b           1.59  
+    4 COAD_CIN SBS15            2.29  
+    5 COAD_CIN SBS28            0.261 
+    6 COAD_CIN SBS40           48.1   
 
 ``` r
 # Selecting only COAD subtypes
@@ -881,7 +884,7 @@ ggplot(acts_per_subgroup) +
          y = 'Average number of mutations')
 ```
 
-![](MS_Practical_WCSCGA2023_files/figure-gfm/associations-1.png)<!-- -->
+![](MS_Practical_WCSCGA2023_files/figure-commonmark/associations-1.png)
 
 ### **Discussion \#5**
 
@@ -895,40 +898,138 @@ following questions:
   <select class='solveme' data-answer='["POLE signatures (SBS10a, SBS10b)"]'>
   <option></option> <option>Aging signatures (SBS1, SBS5)</option>
   <option>MSI signatures (SBS15, SBS44)</option> <option>POLE signatures
-  (SBS10a, SBS10b)</option></select>
-- **Q14.** According to the signature results, which is the DNA repair
-  associated gene that seems to be mutated and causing the mutational
-  pattern observed in the `COAD_POLE` cases?
-  <input class='solveme nospaces ignorecase' size='4' data-answer='["POLE"]'/>
-- **Q15.** Which set of signatures is more prevalent in the `COAD_MSI`
+  (SBS10a, SBS10b)</option></select> - **Q14.** According to the
+  signature results, which is the DNA repair associated gene that seems
+  to be mutated and causing the mutational pattern observed in the
+  `COAD_POLE` cases?
+  <input class='solveme nospaces ignorecase' size='4' data-answer='["POLE"]'/> -
+  **Q15.** Which set of signatures is more prevalent in the `COAD_MSI`
   subtype in comparison to others? <br>
   <select class='solveme' data-answer='["MSI signatures (SBS15, SBS44)"]'>
   <option></option> <option>Aging signatures (SBS1, SBS5)</option>
   <option>MSI signatures (SBS15, SBS44)</option> <option>POLE signatures
-  (SBS10a, SBS10b)</option></select>
-- **Q16.** According to the signature results, which is the DNA repair
-  pathway that seems to be altered and causing the mutational pattern
-  observed in the `COAD_MSI` cases? <br>
-  <select class='solveme' data-answer='["Mismatch repair"]'>
+  (SBS10a, SBS10b)</option></select> - **Q16.** According to the
+  signature results, which is the DNA repair pathway that seems to be
+  altered and causing the mutational pattern observed in the `COAD_MSI`
+  cases? <br> <select class='solveme' data-answer='["Mismatch repair"]'>
   <option></option> <option>Homologous recombination</option>
   <option>Mismatch repair</option> <option>Base excision repair</option>
   <option>Nucleotide excision repair</option></select>
 
 </div>
 
-# 9. \[OPTIONAL\] Advanced mutational signature analysis using the SigProfilerAssignment python package
+# 9. Additional exercises: Associating signature activities with specific metadata
 
-In order to install the SigProfiler suite of tools in your own computer,
-first, you will need to install the `Miniconda` package manager, which
-is highly recommended for python users and can also be used to manage
-your R dependencies. `Miniconda` philosophy is built around **conda
-environments**, which correspond to closed containers where all the
-versions of the different python/R packages are fixed. This structure
-highly benefits the reproducibility of the code, as each analysis can be
-done with an exclusively dedicated environment, which will not change
-any dependency version, even though the general python installation of
-the computer or a particular package is updated. Please note that
-`Miniconda` installation differs between macOS and Windows users.
+To gain more deeply understanding in the use of metadata or associations
+between available datasets, we are going to explore if more patients in
+the maf_cbioportal could have associated SBS10a and SBS10b signatures
+but not have associated *POLE* data subtype. To do this we are going to
+start filtering the variants in the *POLE* gene in maf_cbioportal. After
+that, as we already know, there are a few mutations in the *POLE* gene
+that cause functional damage, causing the presence of the associated
+SBS10a and SBS10b signatures. These mutations in *POLE* gene must be
+SNPs in the exonuclease domain (ED) that goes from codon 268 to codon
+471
+(<https://www.gimjournal.org/article/S1098-3600(21)00815-7/fulltext>)
+
+``` r
+# From the initial dataset we only pick variants in POLE
+maf_cbioportal_POLE = maf_cbioportal %>%
+  filter(Hugo_Symbol == 'POLE')
+
+# We record into Samples_with_ED_POLE_var the Tumor_Samples_Barcode of samples with variants in the ED of POLE
+Samples_with_ED_POLE_var = maf_cbioportal_POLE %>% 
+  filter(between(Protein_position, 268, 471)) %>%
+  distinct(Tumor_Sample_Barcode)
+
+# Now, we need to know what samples of the cohort had Signatures Activities related to POLE (SBS10a and SBS10b)
+SBS96_Activities = read.delim('signatures/SPE/SBS96/Suggested_Solution/COSMIC_SBS96_Decomposed_Solution/Activities/COSMIC_SBS96_Activities.txt')
+
+SBS96_Activities_POLE = SBS96_Activities %>% 
+  select(Samples, SBS10a, SBS10b)
+
+
+# Here we are print a list of samples that have a "variant in the ED of POLE" and it's activities in the SBS10a and SBS10b signature
+SBS96_Activities_POLE %>%
+  filter(Samples %in% Samples_with_ED_POLE_var$Tumor_Sample_Barcode)
+
+
+# now we are plotting the mutational burden (quantity of variants per sample) of the samples that contain a varianat in the ED of POLE gene
+maf_cbioportal_var_POLE_sign = maf_cbioportal %>% 
+  filter(Tumor_Sample_Barcode %in% Samples_with_ED_POLE_var$Tumor_Sample_Barcode)
+
+ggplot(data = maf_cbioportal_var_POLE_sign) +
+  geom_bar(mapping = aes(x = Tumor_Sample_Barcode)) +
+    theme(axis.text.x = element_text(angle = 90))
+```
+
+![](MS_Practical_WCSCGA2023_files/figure-commonmark/associations_2-1.png)
+
+               Samples SBS10a SBS10b
+    1  TCGA-AA-3510-01   1405   1680
+    2  TCGA-AA-3977-01   1736   1355
+    3  TCGA-AA-3984-01   1551   2579
+    4  TCGA-AA-A00N-01   1371   2922
+    5  TCGA-AA-A010-01   3817   2553
+    6  TCGA-AG-3892-01   1464    831
+    7  TCGA-AG-A002-01   7892   5551
+    8  TCGA-AZ-4315-01   1945   3331
+    9  TCGA-AZ-4615-01      0      0
+    10 TCGA-CA-6718-01   1794   1047
+    11 TCGA-EI-6917-01   1416   4086
+    12 TCGA-F4-6570-01      0      0
+    13 TCGA-F5-6814-01   4842   3241
+
+### **Discussion \#6**
+
+Explore the causatives of specific samples and the relationship between
+variants, metadata subtypes, and signatures activities:
+
+<div class="q_box">
+
+- **Q17.** What is the cause why two samples that have variants in the
+  ED of *POLE* gene do not have activities in the SBS10a and SBS10b
+  signatures? <br>
+  <select class='solveme' data-answer='["no SNP variant"]'>
+  <option></option> <option>benign variant</option> <option>filtering
+  error</option> <option>no SNP variant</option></select>
+- **Q18.** Which are the samples that have variants in the ED POLE gene
+  and have activities signatures as SBS10a and SBS10b but do not have
+  assigned subtype in the metada (acts_and_metadata)? <br>
+  <select class='solveme' data-answer='["TCGA-AA-3977-01 TCGA-AA-A00N-01"]'>
+  <option></option> <option>TCGA-F5-6814-01 TCGA-AA-3510-01</option>
+  <option>TCGA-AA-A010-01 TCGA-AG-A002-01</option>
+  <option>TCGA-AA-3977-01 TCGA-AA-A00N-01</option></select>
+- **Q19.** What dou you think about two samples with fewer mutations?
+  <br>
+  <select class='solveme' data-answer='["not POLE signature not hypermutated"]'>
+  <option></option> <option>could have concomitant DNA repair
+  alterations</option> <option>not POLE signature not
+  hypermutated</option> <option>KRAS mutated do not have so much
+  mutations</option></select>
+- **Q20.** In relation to the paper shared above, which gene do you
+  think may have a mechanism similar to that of POLE. Variants in a
+  specific domain and specific mutational signature? <br>
+  <select class='solveme' data-answer='["POLD1"]'> <option></option>
+  <option>MUTYH</option> <option>POLD1</option> <option>KRAS</option>
+  <option>NTHL1</option></select>
+
+</div>
+
+# 10. \[OPTIONAL\] Advanced mutational signature analysis using the SigProfiler suite
+
+In order to install the SigProfiler suite of bioinformatics tools in
+your own computer, first, you will need to install the `Miniconda`
+package manager, which is highly recommended for python users and can
+also be used to manage your R dependencies. `Miniconda` philosophy is
+built around **conda environments**, which correspond to closed
+containers where all the versions of the different python/R packages are
+fixed. This structure highly benefits the reproducibility of the code,
+as each analysis can be done with an exclusively dedicated environment,
+which will not change any dependency version, even though the general
+python installation of the computer or a particular package is updated.
+Please note that `Miniconda` installation differs between macOS and
+Windows users.
 
 Following the code below, you can install the main SigProfiler packages
 for both python and R, for using them in your own analysis. Instructions
@@ -963,18 +1064,19 @@ system(paste0(path_of_conda, ' create --name ', new_environment_name, ' -y'))
 system(paste0(path_of_conda, ' install -n ', new_environment_name, ' python=3.10 -y'))
 
 ## Windows (using Anaconda Prompt)
-conda create --name bimm143_wi23 -y
-conda activate bimm143_wi23
+conda create --name mutational_signatures -y
+conda activate mutational_signatures
 conda install python=3.10 -y
 
-# Install SigProfilerAssigment python package
+# Install SigProfilerExtractor python package (also installs SigProfilerMatrixGenerator,
+# SigProfilerPlotting, and SigProfilerAssignment automatically)
 ## macOS
 system(paste0(path_of_miniconda, '/envs/', new_environment_name,
-              '/bin/pip install SigProfilerAssignment'))
+              '/bin/pip install SigProfilerExtractor'))
 
 ## Windows (using Anaconda Prompt)
-conda activate bimm143_wi23
-pip install SigProfilerAssignment
+conda activate mutational_signatures
+pip install SigProfilerExtractor
 ```
 
 Lastly, we will install all the R packages needed, including
@@ -1020,46 +1122,46 @@ at the time of document execution.
 sessionInfo()
 ```
 
-    ## R version 4.2.3 (2023-03-15)
-    ## Platform: x86_64-apple-darwin17.0 (64-bit)
-    ## Running under: macOS Big Sur ... 10.16
-    ## 
-    ## Matrix products: default
-    ## BLAS:   /Library/Frameworks/R.framework/Versions/4.2/Resources/lib/libRblas.0.dylib
-    ## LAPACK: /Library/Frameworks/R.framework/Versions/4.2/Resources/lib/libRlapack.dylib
-    ## 
-    ## locale:
-    ## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
-    ## 
-    ## attached base packages:
-    ## [1] stats     graphics  grDevices utils     datasets  methods   base     
-    ## 
-    ## other attached packages:
-    ##  [1] SigProfilerExtractorR_1.1.16       SigProfilerPlottingR_0.1.0        
-    ##  [3] SigProfilerMatrixGeneratorR_1.2.13 reticulate_1.30                   
-    ##  [5] lubridate_1.9.2                    forcats_1.0.0                     
-    ##  [7] stringr_1.5.0                      dplyr_1.1.3                       
-    ##  [9] purrr_1.0.2                        readr_2.1.4                       
-    ## [11] tidyr_1.3.0                        tibble_3.2.1                      
-    ## [13] ggplot2_3.4.4                      tidyverse_2.0.0                   
-    ## [15] labsheet_0.1.2                    
-    ## 
-    ## loaded via a namespace (and not attached):
-    ##  [1] pkgload_1.3.2     jsonlite_1.8.5    here_1.0.1        shiny_1.7.4      
-    ##  [5] highr_0.10        yaml_2.3.7        remotes_2.4.2.1   sessioninfo_1.2.2
-    ##  [9] pillar_1.9.0      lattice_0.20-45   glue_1.6.2        digest_0.6.31    
-    ## [13] promises_1.2.0.1  colorspace_2.1-0  htmltools_0.5.5   httpuv_1.6.9     
-    ## [17] Matrix_1.5-3      pkgconfig_2.0.3   devtools_2.4.5    xtable_1.8-4     
-    ## [21] scales_1.2.1      processx_3.8.1    later_1.3.0       tzdb_0.4.0       
-    ## [25] timechange_0.2.0  farver_2.1.1      generics_0.1.3    usethis_2.1.6    
-    ## [29] ellipsis_0.3.2    cachem_1.0.7      withr_2.5.0       cli_3.6.1        
-    ## [33] magrittr_2.0.3    crayon_1.5.2      mime_0.12         memoise_2.0.1    
-    ## [37] evaluate_0.20     ps_1.7.5          fs_1.6.1          fansi_1.0.4      
-    ## [41] pkgbuild_1.4.0    profvis_0.3.8     tools_4.2.3       prettyunits_1.1.1
-    ## [45] hms_1.1.3         lifecycle_1.0.3   munsell_0.5.0     callr_3.7.3      
-    ## [49] compiler_4.2.3    rlang_1.1.1       grid_4.2.3        rstudioapi_0.15.0
-    ## [53] htmlwidgets_1.6.2 miniUI_0.1.1.1    labeling_0.4.2    rmarkdown_2.21   
-    ## [57] gtable_0.3.3      codetools_0.2-19  R6_2.5.1          knitr_1.42       
-    ## [61] fastmap_1.1.1     utf8_1.2.3        rprojroot_2.0.3   stringi_1.7.12   
-    ## [65] Rcpp_1.0.10       vctrs_0.6.4       png_0.1-8         tidyselect_1.2.0 
-    ## [69] xfun_0.38         urlchecker_1.0.1
+    R version 4.2.3 (2023-03-15)
+    Platform: x86_64-apple-darwin17.0 (64-bit)
+    Running under: macOS Big Sur ... 10.16
+
+    Matrix products: default
+    BLAS:   /Library/Frameworks/R.framework/Versions/4.2/Resources/lib/libRblas.0.dylib
+    LAPACK: /Library/Frameworks/R.framework/Versions/4.2/Resources/lib/libRlapack.dylib
+
+    locale:
+    [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+    attached base packages:
+    [1] stats     graphics  grDevices utils     datasets  methods   base     
+
+    other attached packages:
+     [1] SigProfilerExtractorR_1.1.16       SigProfilerPlottingR_0.1.0        
+     [3] SigProfilerMatrixGeneratorR_1.2.13 reticulate_1.30                   
+     [5] lubridate_1.9.2                    forcats_1.0.0                     
+     [7] stringr_1.5.0                      dplyr_1.1.3                       
+     [9] purrr_1.0.2                        readr_2.1.4                       
+    [11] tidyr_1.3.0                        tibble_3.2.1                      
+    [13] ggplot2_3.4.4                      tidyverse_2.0.0                   
+    [15] labsheet_0.1.2                    
+
+    loaded via a namespace (and not attached):
+     [1] pkgload_1.3.2     jsonlite_1.8.5    here_1.0.1        shiny_1.7.4      
+     [5] yaml_2.3.7        remotes_2.4.2.1   sessioninfo_1.2.2 pillar_1.9.0     
+     [9] lattice_0.20-45   glue_1.6.2        digest_0.6.31     promises_1.2.0.1 
+    [13] colorspace_2.1-0  htmltools_0.5.5   httpuv_1.6.9      Matrix_1.5-3     
+    [17] pkgconfig_2.0.3   devtools_2.4.5    xtable_1.8-4      scales_1.2.1     
+    [21] processx_3.8.1    later_1.3.0       tzdb_0.4.0        timechange_0.2.0 
+    [25] farver_2.1.1      generics_0.1.3    usethis_2.1.6     ellipsis_0.3.2   
+    [29] cachem_1.0.7      withr_2.5.0       cli_3.6.1         magrittr_2.0.3   
+    [33] crayon_1.5.2      mime_0.12         memoise_2.0.1     evaluate_0.20    
+    [37] ps_1.7.5          fs_1.6.1          fansi_1.0.4       pkgbuild_1.4.0   
+    [41] profvis_0.3.8     tools_4.2.3       prettyunits_1.1.1 hms_1.1.3        
+    [45] lifecycle_1.0.3   munsell_0.5.0     callr_3.7.3       compiler_4.2.3   
+    [49] rlang_1.1.1       grid_4.2.3        rstudioapi_0.15.0 htmlwidgets_1.6.2
+    [53] miniUI_0.1.1.1    labeling_0.4.2    rmarkdown_2.21    gtable_0.3.3     
+    [57] codetools_0.2-19  R6_2.5.1          knitr_1.42        fastmap_1.1.1    
+    [61] utf8_1.2.3        rprojroot_2.0.3   stringi_1.7.12    Rcpp_1.0.10      
+    [65] vctrs_0.6.4       png_0.1-8         tidyselect_1.2.0  xfun_0.38        
+    [69] urlchecker_1.0.1 
