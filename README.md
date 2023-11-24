@@ -16,7 +16,7 @@ The course will be led by experts in cancer genomics from Latin America and the 
 
 - [Daniela Robles-Espinoza](http://www.liigh.unam.mx/drobles), LIIGH-UNAM, Mexico
 - [Patricia Basurto Losada](https://liigh.unam.mx/drobles/index.php/members/), LIIGH-UNAM, Mexico
-- [Mariana Boroni][https://www.gov.br/inca/pt-br/assuntos/pesquisa/pesquisa-basica-e-experimental/bioinformatica-e-biologia-computacional], iNCA, Brazil
+- [Mariana Boroni](https://www.gov.br/inca/pt-br/assuntos/pesquisa/pesquisa-basica-e-experimental/bioinformatica-e-biologia-computacional), iNCA, Brazil
 - [Nyasha Chambwe](https://feinstein.northwell.edu/institutes-researchers/our-researchers/nyasha-chambwe-phd), Feinstein Institutes for Medical Research, USA
 - [Santiago Chávez](http://www.genetica.fmed.edu.uy/integrantes), Universidad de la República, Uruguay
 - [Leandro Colli](http://lto.fmrp.usp.br/), University of São Paulo, Brazil
