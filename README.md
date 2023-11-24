@@ -20,7 +20,7 @@ The course will be led by experts in cancer genomics from Latin America and the 
 - [Nyasha Chambwe](https://feinstein.northwell.edu/institutes-researchers/our-researchers/nyasha-chambwe-phd), Feinstein Institutes for Medical Research, USA
 - [Santiago Chávez](http://www.genetica.fmed.edu.uy/integrantes), Universidad de la República, Uruguay
 - [Leandro Colli](http://lto.fmrp.usp.br/), University of São Paulo, Brazil
-- [eric Dawson](https://www.erictdawson.com/), Nvidia, USA
+- [Eric Dawson](https://www.erictdawson.com/), Nvidia, USA
 - [Marcos Díaz-Gay](https://marcos-diazg.github.io/), UCSD, USA
 - [Mariano Golubicki](https://golubicki.github.io/), Hospital Udoanod - IATTGI, Argentina
 - [Andrés Iriarte](https://higiene.edu.uy/ddbp/lbc/en/), Universidad de la República, Uruguay
