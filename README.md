@@ -33,6 +33,8 @@ The course will be led by experts in cancer genomics from Latin America and the 
 
 - [Data Formats and QC Slides](https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/Modules/Data_formats_and_QC/202310_Module_1_Lecture_Data_formats.pdf)
 - [Data Formats and QC Exercises](https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/course_data/Module_1/data_formats_exercises.pdf)
+- [Mutation Calling Slides](https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/Modules/Mutation%20calling/Cancer%20Genomics%20Course%20-%20Somatic%20Variant%20Calling.pptx)
+- [Mutation Calling Exercises](https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/Modules/Mutation%20calling/mutation_calling_exercises.md)
 
 Shield: [![CC BY 4.0][cc-by-shield]][cc-by]
 
