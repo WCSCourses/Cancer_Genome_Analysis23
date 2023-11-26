@@ -29,6 +29,11 @@ The course will be led by experts in cancer genomics from Latin America and the 
 
 ## [Course Timetable](https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/Cancer%20Genomics%202023%20Timetable.pdf)
 
+## Presentations and Practical Sessions
+
+- [Data Formats and QC Slides](https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/Modules/Data_formats_and_QC/202310_Module_1_Lecture_Data_formats.pdf)
+- [Data Formats and QC Exercises](https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/course_data/Module_1/data_formats_exercises.pdf)
+
 Shield: [![CC BY 4.0][cc-by-shield]][cc-by]
 
 This work is licensed under a
