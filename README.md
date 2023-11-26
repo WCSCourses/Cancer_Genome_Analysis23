@@ -38,6 +38,8 @@ The course will be led by experts in cancer genomics from Latin America and the 
 - [Driver Detection Practical](https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/Modules/Driver_detection/Driver_detection_dndscv_2023.pdf)
 - [maftools Practical](https://htmlpreview.github.io/?https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/Modules/Driver_detection/Maftools_practical.html)
 - [Extra maftools exercises](https://htmlpreview.github.io/?https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/Modules/Driver_detection/Extra_maftools_exercises.html)
+- [Mutational Signature Analysis Slides](https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/Modules/Mutational_signature_analysis/MutSigs_WCSCGA2023_4.pdf)
+- [Mutational Signature Analysis Exercises](https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/Modules/Mutational_signature_analysis/MS_Practical_WCSCGA2023.md)
 
 Shield: [![CC BY 4.0][cc-by-shield]][cc-by]
 
