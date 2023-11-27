@@ -27,6 +27,21 @@ The course will be led by experts in cancer genomics from Latin America and the 
 - [Cecilia Mathó](http://www.genetica.fmed.edu.uy/integrantes), Universidad de la República, Uruguay
 - [Lucia Spangenberg](https://scholar.google.com/citations?user=V0zb3pYAAAAJ), Institut Pasteur de Mondevideo, Uruguay
 
+## [Course Timetable](https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/Cancer%20Genomics%202023%20Timetable.pdf)
+
+## Presentations and Practical Sessions
+
+- [Data Formats and QC Slides](https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/Modules/Data_formats_and_QC/202310_Module_1_Lecture_Data_formats.pdf)
+- [Data Formats and QC Exercises](https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/course_data/Module_1/data_formats_exercises.pdf)
+- [Mutation Calling Slides](https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/Modules/Mutation%20calling/Cancer%20Genomics%20Course%20-%20Somatic%20Variant%20Calling.pptx)
+- [Mutation Calling Exercises](https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/Modules/Mutation%20calling/mutation_calling_exercises.md)
+- [Driver Detection Practical](https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/Modules/Driver_detection/Driver_detection_dndscv_2023.pdf)
+- [maftools Practical](https://htmlpreview.github.io/?https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/Modules/Driver_detection/Maftools_practical.html)
+- [Extra maftools exercises](https://htmlpreview.github.io/?https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/Modules/Driver_detection/Extra_maftools_exercises.html)
+- [Mutational Signature Analysis Slides](https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/Modules/Mutational_signature_analysis/MutSigs_WCSCGA2023_4.pdf)
+- [Mutational Signature Analysis Exercises](https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/Modules/Mutational_signature_analysis/MS_Practical_WCSCGA2023.md)
+- [RNA Deconvolution Exercises](https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/Modules/RNA_Deconvolution/Data_Deconvolution/deconv_cibersort/Exercise_cibersort_analysis.pdf)
+
 Shield: [![CC BY 4.0][cc-by-shield]][cc-by]
 
 This work is licensed under a
