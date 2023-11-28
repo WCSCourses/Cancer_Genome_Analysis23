@@ -18,7 +18,7 @@ In this practical, we will:
 5. Build an intuition for variant quality control.
 
 **NOTE:** The Virtual Machine used in the live courses are all set up - skip directly to
-[Practical](https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/Modules/Mutation%20calling/mutation_calling_exercises.md#Practical) if you are using a pre-built VM (and not your own Linux machine).
+[Practical](https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/Modules/02_Mutation_Calling/mutation_calling_exercises.md#practical) if you are using a pre-built VM (and not your own Linux machine).
 
 # Set up and configuration
 
