@@ -33,22 +33,14 @@ wget <file>
 ```
 
 
-In the VM, we have a directory titled `/home/manager/data/alignment&variant_calling`.
+In the VM, we have a directory titled `/home/manager/course_data`.
 This directory contains data from the [Texas Cancer Research Biobank Open Access project.](http://stegg.hgsc.bcm.edu/open.html).
-Please move this directory to a new name so that we don't have to escape the '&' character:
-
-```bash
-cd ~
-cd data
-
-mv alignment&variant_calling module_2
-
-```
-
-If you're on your own machine, create a directory named `module_2` and store your data there.
 
 
-We're using whole-genome sequenced data from Case 006, a woman in her 60s who presented with neuroendocrine carcinoma
+If you're on your own machine, create a directory named `course_data` and store your data there.
+
+
+We're using whole-eexome sequenced data from Case 002, a woman in her 60s who presented with neuroendocrine carcinoma
 of the pancreas and received no prior treatment.
 
 
@@ -56,19 +48,23 @@ What command would you use to see which files are in the directory?
 ```bash
 
 ```
-Files in the /home/manager/data/module_2 directory with latest data.
+
+Files in the /home/manager/course_data directory with latest data.
 
 
-The /home/manager/data/module_2 directory contains the FASTQs, BAMs, and example VCFs for this patient's tumor and normal sample.
+The /home/manager/course_data directory contains the FASTQs, BAMs, and example VCFs for this patient's tumor and normal sample.
 As we go through this tutorial, you'll run the commands to generate each of these files, but you can also skip over long-running
 computational tasks since the data needed is already present. As this is standard whole-genome data, you can also use this for 
 testing and learning other software so long as you follow the data access agreement rules.
 
 ### Backup public data
-The following links contain the backup data available publicly. Please download these into the `module_2` directory.
+The following links contain the backup data available publicly.
+Please download these into the `mutation_calling` directory _if you are not using the VM_.
 
 ```bash
-cd module_2
+## create a directory in your home directory
+mkdir mutation_calling
+cd mutation_calling
 ```
 
 Tarball of folder containing references: `https://r2-public-worker.atacama.workers.dev/references.tar`
@@ -250,7 +246,21 @@ To slice our BAM, we'll do the following:
 samtools view -o TCRBOA2-N-WEX.region.bam -b ~/course_data/TCRBOA2-N-WEX.bam chr22:28650000-28750000
 ```
 
-Do the same for the Tumor sample.
+**How many reads are in the TCRBOA2-N-WEX.region.bam BAM file?** (Hint: you can use the first few lines of output of `samtools stats`, and remember the `head` and `less` commands can help view portions of files.)
+
+```
+
+
+```
+
+
+Now, slice the Tumor sample BAM to the same region; make sure to name it using the same convention.
+
+```bash
+
+## Fill out the missing portions of this command
+samtools view -o ??? -b ??? chr22:28650000-28750000
+```
 
 2. Convert our BAM to FASTQ so we can realign our reads. We can use the `samtools fastq` command for this:
 ```bash
@@ -276,12 +286,18 @@ samtools faidx <ref>
 bwa index <ref>
 ```
 
+Then, create the FASTA dict file using GATK: 
+
+```bash
+gatk CreateSequenceDictionary -R Homo_sapiens_assembly38.chr22_28650000-28750000.fasta
+```
+
 4. Download the known indels file we need for base quality score recalibration and its tabix index
 
 ```bash
-wget ttps://r2-public-worker.atacama.workers.dev/Homo_sapiens_assembly38.known_indels.chr22_28650000-28750000.vcf.gz
+wget https://r2-public-worker.atacama.workers.dev/Homo_sapiens_assembly38.known_indels.chr22_28650000-28750000.vcf.gz
 
-wget ttps://r2-public-worker.atacama.workers.dev/Homo_sapiens_assembly38.known_indels.chr22_28650000-28750000.vcf.gz.tbi
+wget https://r2-public-worker.atacama.workers.dev/Homo_sapiens_assembly38.known_indels.chr22_28650000-28750000.vcf.gz.tbi
 ```
 
 
@@ -345,7 +361,7 @@ index our BAM later.
 Let's check if our BAM is valid - we can do so with `samtools quickcheck`:
 
 ```bash
-samtools quickcheck chr22.TCRBOA6-Normal.region.bam
+samtools quickcheck TCRBOA2-N-WEX.region.bam
 ```
 
 Expected runtime: 1 second.
@@ -435,17 +451,16 @@ The BQSR process will normalize the quality scores within a BAM file based on a 
 (especially indels), resulting in more accurate variant calls downstream.
 
 
-#TODO fix ref
+
 ```bash
 time gatk BaseRecalibrator \
     --java-options -Xmx4g \
     --input TCRBOA2-Normal.region.markdups.bam \
     --output TCRBOA2-Normal.region.markdups.BQSR-REPORT.txt \
-    --known-sites references/Homo_sapiens_assembly38.known_indels.vcf.gz \
+    --known-sites Homo_sapiens_assembly38.known_indels.chr22_28650000-28750000.vcf.gz \
     --reference Homo_sapiens_assembly38.chr22_28650000-28750000.fasta
 ```
 
-#TODO: fix ref
 ```bash
 time gatk BaseRecalibrator \
     --java-options -Xmx4g \
@@ -525,12 +540,13 @@ Our BAM index is kind of like the index of a book. What do you think its coordin
 ## Variant calling
 
 We can now run MuTect2 to call somatic variants in our matched tumor and normal samples.
-Since we're only interested in chromosome 22 (at least for this analysis), we can 
-tell MuTect2 to only call that interval using `-L chr22`. 
 
-##TODO: change reference
+If you're on the VM, switch to the whole-exome BAMs
+Since we're only interested in chromosome 22 (at least for this analysis), we can 
+tell MuTect2 to only call that interval using `-L chr22`). 
+
 ```bash
-~/gatk-4.2.6.1/gatk Mutect2 \
+gatk Mutect2 \
     -R Homo_sapiens_assembly38.chr22_28650000-28750000.fasta \
     --input TCRBOA2-Tumor.region.markdups.baseRecal.bam \
     --tumor-sample TCRBOA2-Tumor \
@@ -542,8 +558,34 @@ tell MuTect2 to only call that interval using `-L chr22`.
 
 Expected runtime: 30-60 minutes
 
+### Using a PON
+**Note**: We might want to use a PON, such as one of the publicly-available ones at: `https://console.cloud.google.com/storage/browser/gatk-best-practices/somatic-hg38%2F;tab=objects?prefix=&forceOnObjectsSortingFiltering=false`
 
-We now have a somatic VCF file from MuTect2. But before we start looking for driver mutations or 
+We could download the file like so:
+
+```bash
+wget https://storage.googleapis.com/gatk-best-practices/somatic-hg38/1000g_pon.hg38.vcf.gz
+
+wget https://storage.googleapis.com/gatk-best-practices/somatic-hg38/1000g_pon.hg38.vcf.gz.tbi
+```
+
+Then, pass the PON to mutect:
+
+```bash
+## Note the addition of the --panel-of-normals flag
+gatk Mutect2 \
+    -R Homo_sapiens_assembly38.chr22_28650000-28750000.fasta \
+    --panel-of-normals 1000g_pon.hg38.vcf.gz \
+    --input TCRBOA2-Tumor.region.markdups.baseRecal.bam \
+    --tumor-sample TCRBOA2-Tumor \
+    --input TCRBOA2-Normal.region.markdups.baseRecal.bam \
+    --normal-sample TCRBOA2-Normal \
+    -L chr22 \
+    --output TCRBOA2-Tumor.TCRBOA2-Normal.region.vcf
+```
+
+
+We now have a somatic VCF file from MuTect2 (in the VM, there should be a backup one in `/home/manager/course_data`). But before we start looking for driver mutations or 
 mutational signatures, we should run some basic quality control and assess some of our variants in IGV.
 The following section will give a brief overview of quality control and assessment techniques.
 
@@ -568,6 +610,7 @@ If we want the number of lines that _don't_ match a pattern, we can use `grep -c
 
 ```
 
+**Hint: we might have chosen a region that isn't mutated in our tumor**
 
 ## Manual Review
 
@@ -592,9 +635,9 @@ tumor purity, and true positive variants.
 - `DP`: Depth. The number of reads covering a given position. We should expect this value to be close to the estimated depth of our sequencing.
 - `QUAL`: the VCF quality field is filled by every caller, though it doesn't have a strict definition. It can't be compared across variant callers and a filter that works for one callset may not work well for another.
 - For mutect2, `F1R2` and `F2R1`: these describe the number of reads in proper versus improper orientation that supports the variant. Too many reads in the improper orientation can indicate that the variant we're examining is unlikely to be real.
+- 
 
-
-Let's look at an example line from our VCF (and the last line in our VCF header):
+Let's look at an example line from a VCF (and the last line in the VCF header):
 ```
 #CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  TCRBOA6-Normal  TCRBOA6-Tumor
 chr22   10573224        .       C       CT      .       .       AS_SB_TABLE=6,19|3,2;DP=30;ECNT=1;MBQ=35,35;MFRL=546,354;MMQ=40,40;MPOS=38;NALOD=0.997;NLOD=2.66;POPAF=6.00;RPA=2,3;RU=T;STR;TLOD=10.46 GT:AD:AF:DP:F1R2:F2R1:FAD:SB     0/0:9,0:0.092:9:3,0:5,0:9,0:2,7,0,0     0/1:16,5:0.263:21:6,2:10,3:16,5:4,12,3,2
@@ -607,6 +650,7 @@ here immediately flags it for removal outside of the low allele fraction.
 **Question: Can you calculate the VAF for this variant? Do we calculate this in the normal, tumor, or both?**
 
 ```
+
 
 
 ```
@@ -626,9 +670,9 @@ and intuition used in determining whether a variant is real or not in IGV. As yo
 a real variant looks like and what characteristics are shared among false variants.
 
 
-We can open up IGV, change the genome to human HG38, and load our files for the tumor and normal. Next, we'll use the location
-bar to navigate to the variant we reviewed above. We can then click the coverage bars at the location to open up the detailed
-allele fraction view. The resulting IGV screen will look roughly like the screenshot below:
+We can open up IGV, change the genome to human HG38, and load our files for the tumor and normal (File -> Load from File -> Select Bam and Load). Next, we'll use the location
+bar to navigate to the variant we reviewed above (click the box that is next to the word "Go"; put your position in; click "Go"). We can then click the coverage bars at the location to open up the detailed
+allele fraction view (See the track that says our sample name and then "Coverage"? You can click specific locations in this track in any sample). The resulting IGV screen will look roughly like the screenshot below:
 
 ![](images/igv_3.png)
 
@@ -660,6 +704,36 @@ What are some characteristics of this variant that indicate we should believe it
 
 ```
 
+Here's another variant:
+
+![](images/TERT.png)
+
+Why might this variant be important (hint: look at the bottom of IGV)?
+```
+
+
+
+```
+
+What is the approximate purity of our tumor if:
+- We have three reads with the ALT allele
+- Our call was made as a heterozygous variant
+- The total number of reads at this location is 10
+  
+```
+
+
+```
+
+
+**Use IGV to reproduce the screenshot above:**
+1. Open IGV
+2. Load your BAM files using the File menu. We'll use the whole-exome BAMs our collaborator shared with us in the `course_data` directory.
+3. You can also load your VCF - try it!
+4. Select "hg38" as the reference genome.
+5. Navigate the position specified in the screenshot on chr5.
+6. Use the zoom sliders to adjust the view; you can also drag the view with your mouse.
+
 ## Variant annotation with Funcotator
 
 To make use of our variants, we'll want to annotate them. The GATK includes a tool called Funcotator
@@ -667,7 +741,7 @@ that can annotate our VCF with information from databases such as the name of th
 the variant's effect on the protein if any, and whether the variant is present at high allele frequcny in
 any populations. Funcotator can output either VCF or MAF, both of which can be used in downstream tools.
 
-**NOTE: Skip running this section if you're on the VM. The funcotator sources are too large.**
+**NOTE: Skip running this section if you're on the VM. The funcotator sources are too large. You can download an example MAF file from: https://r2-public-worker.atacama.workers.dev/TCRBOA2-Tumor.TCRBOA2-Normal.funcotated.maf.gz**
 
 Because Funcotator uses data from external databases, it requires very large input files. For this reason 
 we've excluded it from the VM. Below you can find the commands to annotate our somatic VCF:
@@ -692,7 +766,7 @@ tar xvzf funcotator_dataSources.v1.7.20200521s.tar.gz
 
 ```
 
-Funcotator MAFs have a large header describing the fields. Below, you can find two example variants:
+Funcotator MAFs have a large header describing the fields. Below, you can find two example variants (these come from the TCRBOA6 sample, whose MAF is: chr22.TCRBOA6-Tumor.TCRBOA6-Normal.funcotated.maf) **hint**: try copying this text to a file, and viewing it with `less`:
 
 ```
 Hugo_Symbol	Entrez_Gene_Id	Center	NCBI_Build	Chromosome	Start_Position	End_Position	Strand	Variant_Classification	Variant_Type	Reference_Allele	Tumor_Seq_Allele1	Tumor_Seq_Allele2	dbSNP_RS	dbSNP_Val_Status	Tumor_Sample_Barcode	Matched_Norm_Sample_Barcode	Match_Norm_Seq_Allele1	Match_Norm_Seq_Allele2	Tumor_Validation_Allele1	Tumor_Validation_Allele2	Match_Norm_Validation_Allele1	Match_Norm_Validation_Allele2	Verification_Status	Validation_Status	Mutation_Status	Sequencing_Phase	Sequence_Source	Validation_Method	Score	BAM_File	Sequencer	Tumor_Sample_UUID	Matched_Norm_Sample_UUID	Genome_Change	Annotation_Transcript	Transcript_Strand	Transcript_Exon	Transcript_Position	cDNA_Change	Codon_Change	Protein_Change	Other_Transcripts	Refseq_mRNA_Id	Refseq_prot_Id	SwissProt_acc_Id	SwissProt_entry_Id	Description	UniProt_AApos	UniProt_Region	UniProt_Site	UniProt_Natural_Variations	UniProt_Experimental_Info	GO_Biological_Process	GO_Cellular_Component	GO_Molecular_Function	COSMIC_overlapping_mutations	COSMIC_fusion_genes	COSMIC_tissue_types_affected	COSMIC_total_alterations_in_gene	Tumorscape_Amplification_Peaks	Tumorscape_Deletion_Peaks	TCGAscape_Amplification_Peaks	TCGAscape_Deletion_Peaks	DrugBank	ref_context	gc_content	CCLE_ONCOMAP_overlapping_mutations	CCLE_ONCOMAP_total_mutations_in_gene	CGC_Mutation_Type	CGC_Translocation_Partner	CGC_Tumor_Types_Somatic	CGC_Tumor_Types_Germline	CGC_Other_Diseases	DNARepairGenes_Activity_linked_to_OMIM	FamilialCancerDatabase_Syndromes	MUTSIG_Published_Results	OREGANNO_ID	OREGANNO_Values	tumor_f	t_alt_count	t_ref_count	n_alt_count	n_ref_count	Gencode_34_secondaryVariantClassification	Achilles_Top_Genes	CGC_Name	CGC_GeneID	CGC_Chr	CGC_Chr_Band	CGC_Cancer_Somatic_Mut	CGC_Cancer_Germline_Mut	CGC_Cancer_Syndrome	CGC_Tissue_Type	CGC_Cancer_Molecular_Genetics	CGC_Other_Germline_Mut	ClinVar_VCF_AF_ESP	ClinVar_VCF_AF_EXAC	ClinVar_VCF_AF_TGP	ClinVar_VCF_ALLELEID	ClinVar_VCF_CLNDISDB	ClinVar_VCF_CLNDISDBINCL	ClinVar_VCF_CLNDN	ClinVar_VCF_CLNDNINCL	ClinVar_VCF_CLNHGVS	ClinVar_VCF_CLNREVSTAT	ClinVar_VCF_CLNSIG	ClinVar_VCF_CLNSIGCONF	ClinVar_VCF_CLNSIGINCL	ClinVar_VCF_CLNVC	ClinVar_VCF_CLNVCSO	ClinVar_VCF_CLNVI	ClinVar_VCF_DBVARID	ClinVar_VCF_GENEINFO	ClinVar_VCF_MC	ClinVar_VCF_ORIGIN	ClinVar_VCF_RS	ClinVar_VCF_SSR	ClinVar_VCF_ID	ClinVar_VCF_FILTER	CosmicFusion_fusion_id	DNARepairGenes_Chromosome_location_linked_to_NCBI_MapView	DNARepairGenes_Accession_number_linked_to_NCBI_Entrez	Familial_Cancer_Genes_Synonym	Familial_Cancer_Genes_Reference	Gencode_XHGNC_hgnc_id	HGNC_HGNC_ID	HGNC_Status	HGNC_Locus_Type	HGNC_Locus_Group	HGNC_Previous_Symbols	HGNC_Previous_Name	HGNC_Synonyms	HGNC_Name_Synonyms	HGNC_Chromosome	HGNC_Date_Modified	HGNC_Date_Symbol_Changed	HGNC_Date_Name_Changed	HGNC_Accession_Numbers	HGNC_Enzyme_IDs	HGNC_Ensembl_Gene_ID	HGNC_Pubmed_IDs	HGNC_RefSeq_IDs	HGNC_Gene_Family_ID	HGNC_Gene_Family_Name	HGNC_CCDS_IDs	HGNC_Vega_ID	HGNC_OMIM_ID(supplied_by_OMIM)	HGNC_RefSeq(supplied_by_NCBI)	HGNC_UniProt_ID(supplied_by_UniProt)	HGNC_Ensembl_ID(supplied_by_Ensembl)	HGNC_UCSC_ID(supplied_by_UCSC)	Oreganno_Build	Simple_Uniprot_alt_uniprot_accessions	dbSNP_ASP	dbSNP_ASS	dbSNP_CAF	dbSNP_CDA	dbSNP_CFL	dbSNP_COMMON	dbSNP_DSS	dbSNP_G5	dbSNP_G5A	dbSNP_GENEINFO	dbSNP_GNO	dbSNP_HD	dbSNP_INT	dbSNP_KGPhase1	dbSNP_KGPhase3	dbSNP_LSD	dbSNP_MTP	dbSNP_MUT	dbSNP_NOC	dbSNP_NOV	dbSNP_NSF	dbSNP_NSM	dbSNP_NSN	dbSNP_OM	dbSNP_OTH	dbSNP_PM	dbSNP_PMC	dbSNP_R3	dbSNP_R5	dbSNP_REF	dbSNP_RV	dbSNP_S3D	dbSNP_SAO	dbSNP_SLO	dbSNP_SSR	dbSNP_SYN	dbSNP_TOPMED	dbSNP_TPA	dbSNP_U3	dbSNP_U5	dbSNP_VC	dbSNP_VP	dbSNP_WGT	dbSNP_WTD	dbSNP_dbSNPBuildID	dbSNP_ID	dbSNP_FILTER	HGNC_Entrez_Gene_ID(supplied_by_NCBI)	dbSNP_RSPOS	dbSNP_VLD	AS_SB_TABLE	AS_UNIQ_ALT_READ_COUNT	CONTQ	DP	ECNT	GERMQ	MBQ	MFRL	MMQ	MPOS	NALOD	NCount	NLOD	OCM	PON	POPAF	ROQ	RPA	RU	SEQQ	STR	STRANDQ	STRQ	TLOD
@@ -701,7 +775,7 @@ CHEK2	11200	__UNKNOWN__	hg38	chr22	28687974	28687974	+	Missense_Mutation	SNP	G	G
 
 ```
 
-**Queston:** Which of these fields seem important?
+**Question:** Which of these fields seem important?
 
 ```
 
@@ -742,7 +816,7 @@ because it includes a web interface; however, VEP does not output MAF format. If
 the VEP Web Interface at the following link:
 
 ```
-https://useast.ensembl.org/Homo_sapiens/Tools/VEP
+https://www.ensembl.org/Tools/VEP
 ```
 
 Submitting your data to the form will open a new page with an identifier for your run. It will take several minutes
