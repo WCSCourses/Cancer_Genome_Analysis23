@@ -267,16 +267,18 @@ About 45 seconds (hopefully)
 
 How many unmapped reads were present? (hint: check the metrics.txt file)
 
-##TODO
+
 ```
-46054
+63 (normal)
+44 (Tumor)
 ```
 
 What percent of reads were optical duplicates?
 
-##TODO
+
 ```
-0.009614
+0 in normal
+0 in tumor
 ```
 
 #### Base Quality Score Recalibration
@@ -315,7 +317,7 @@ it should be the same as we generated for alignment.
 
 ##TODO
 ```
-TCRBOA6-Normal-RG1
+TCRBOA2-Normal
 ```
 
 ## Indexing BAM files
@@ -409,12 +411,11 @@ If we want the number of lines that _don't_ match a pattern, we can use `grep -c
 
 ##TODO
 ```
-grep -cv "#" chr22.TCRBOA6-Tumor.TCRBOA6-Normal.vcf
-(or: grep -cv "^#" y.chr22.TCRBOA6-Tumor.TCRBOA6-Normal.vcf, to only count lines starting with '#')
+grep -cv "^#" TCRBOA2-Tumor.TCRBOA2-Normal.vcf
 
-6423 for new data, 3072 for original Parabricks data
+0
 ```
-
+**Hint: we might have chosen a region that isn't mutated in our tumor**
 
 ## Manual Review
 
@@ -426,7 +427,7 @@ We must filter our variants to generate the most specific, sensitive set of vari
 We can view our variants using the Unix program `less`. 
 
 ```bash
-less -S chr22.TCRBOA6-Tumor.TCRBOA6-Normal.vcf
+less -S TCRBOA2-Tumor.TCRBOA2-Normal.region.vcf
 ```
 
 The VCF header (lines beginning with `#`) has information about the fields within the file.
@@ -519,7 +520,7 @@ Here's another variant:
 
 Why might this variant be important (hint: look at the bottom of IGV)?
 ```
-
+It's in TERT, a known cancer gene.
 
 
 ```
