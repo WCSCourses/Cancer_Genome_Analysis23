@@ -267,12 +267,14 @@ About 45 seconds (hopefully)
 
 How many unmapped reads were present? (hint: check the metrics.txt file)
 
+##TODO
 ```
 46054
 ```
 
 What percent of reads were optical duplicates?
 
+##TODO
 ```
 0.009614
 ```
@@ -311,6 +313,7 @@ Expected runtime: 5 minutes for normal, 10 minutes for tumor.
 What is the name of the read group in the BQSR Report for the normal sample? Note that
 it should be the same as we generated for alignment.
 
+##TODO
 ```
 TCRBOA6-Normal-RG1
 ```
@@ -357,6 +360,37 @@ We now have a somatic VCF file from MuTect2. But before we start looking for dri
 mutational signatures, we should run some basic quality control and assess some of our variants in IGV.
 The following section will give a brief overview of quality control and assessment techniques.
 
+### Using a PON
+**Note**: We might want to use a PON, such as one of the publicly-available ones at: `https://console.cloud.google.com/storage/browser/gatk-best-practices/somatic-hg38%2F;tab=objects?prefix=&forceOnObjectsSortingFiltering=false`
+
+We could download the file like so:
+
+```bash
+wget https://storage.googleapis.com/gatk-best-practices/somatic-hg38/1000g_pon.hg38.vcf.gz
+
+wget https://storage.googleapis.com/gatk-best-practices/somatic-hg38/1000g_pon.hg38.vcf.gz.tbi
+```
+
+Then, pass the PON to mutect:
+
+```bash
+## Note the addition of the --panel-of-normals flag
+gatk Mutect2 \
+    -R Homo_sapiens_assembly38.chr22_28650000-28750000.fasta \
+    --panel-of-normals 1000g_pon.hg38.vcf.gz \
+    --input TCRBOA2-Tumor.region.markdups.baseRecal.bam \
+    --tumor-sample TCRBOA2-Tumor \
+    --input TCRBOA2-Normal.region.markdups.baseRecal.bam \
+    --normal-sample TCRBOA2-Normal \
+    -L chr22 \
+    --output TCRBOA2-Tumor.TCRBOA2-Normal.region.vcf
+```
+
+
+We now have a somatic VCF file from MuTect2 (in the VM, there should be a backup one in `/home/manager/course_data`). But before we start looking for driver mutations or 
+mutational signatures, we should run some basic quality control and assess some of our variants in IGV.
+The following section will give a brief overview of quality control and assessment techniques.
+
 
 
 ## Variant assessment and quality control
@@ -373,6 +407,7 @@ How many variants are in our VCF file?
 (Hint: we can use `grep -c "<pattern>" <file>` to count the number of lines that match a pattern in a file.
 If we want the number of lines that _don't_ match a pattern, we can use `grep -c -v "<pattern>" <file>`).
 
+##TODO
 ```
 grep -cv "#" chr22.TCRBOA6-Tumor.TCRBOA6-Normal.vcf
 (or: grep -cv "^#" y.chr22.TCRBOA6-Tumor.TCRBOA6-Normal.vcf, to only count lines starting with '#')
@@ -412,10 +447,33 @@ Let's look at an example line from our VCF (and the last line in our VCF header)
 chr22   10573224        .       C       CT      .       .       AS_SB_TABLE=6,19|3,2;DP=30;ECNT=1;MBQ=35,35;MFRL=546,354;MMQ=40,40;MPOS=38;NALOD=0.997;NLOD=2.66;POPAF=6.00;RPA=2,3;RU=T;STR;TLOD=10.46 GT:AD:AF:DP:F1R2:F2R1:FAD:SB     0/0:9,0:0.092:9:3,0:5,0:9,0:2,7,0,0     0/1:16,5:0.263:21:6,2:10,3:16,5:4,12,3,2
 ```
 
-This variant is an indel - specificially, an insertion of a single T after a C at position 10573224 on chromosome 22. In our normal sample, mutect2 called this variant homozygous reference, with nine reads supporting the reference allele. In the tumor,
-mutect2 called the variant heterozygous, with 16 reference-supporting reads and 5 alternate-supporting reads. The Allele Fraction (AF) field in the tumor is 0.263 (5 / (5 + 16)); this is a pretty low allele fraction for a real variant. The variant has a depth of 9 in
+This variant is an indel - specificially, an insertion of a single T after a C at position 10573224 on chromosome 22. In our normal sample, mutect2 called this variant homozygous reference, with nine reads supporting the reference allele.  The variant has a depth of 9 in
 the normal, which is relatively low for this high-depth sequencing. While this variant seems slightly suspicious, there's nothing
 here immediately flags it for removal outside of the low allele fraction.
+
+
+**Question: Can you calculate the VAF for this variant? Do we calculate this in the normal, tumor, or both?**
+
+
+In the tumor,
+mutect2 called the variant heterozygous, with 16 reference-supporting reads and 5 alternate-supporting reads. The Allele Fraction (AF) field in the tumor is 0.238 (5 / (5 + 16)); this is a pretty low allele fraction for a real variant.
+
+```
+
+VAF = AD / DP
+
+AD of alt allele = 5
+
+DP = 21
+
+VAF = 5 / 21 = 0.238
+```
+
+**Question: If we assume that our tumor was sequenced at a depth of 30x and our normal was sequenced at 20X, what can we say about this position and variant?**
+
+
+**Answer:** This variant is in a region that doesn't seem to sequence very well, and our depth in the region is lower than we expected. We might expect this for an indel - they're often in repetitive regions or areas with low entropy, which makes mapping reads difficult.
+
 
 
 To better assay the variant, let's look at it in IGV. IGV review is performed in nearly every study. There's a lot of nuance
@@ -453,6 +511,29 @@ What are some characteristics of this variant that indicate we should believe it
 However, note that all of the reads supporting the variant are in the forward direction. This could be due to change but 
 may also indicate that our variant is the result of sequencing error or bias. In this case, I'd probably consult a database
 to see if this variant has been observed before.
+
+
+Here's another variant:
+
+![](images/TERT.png)
+
+Why might this variant be important (hint: look at the bottom of IGV)?
+```
+
+
+
+```
+
+What is the approximate purity of our tumor if:
+- We have three reads with the ALT allele
+- Our call was made as a heterozygous variant
+- The total number of reads at this location is 10
+  
+```
+
+
+```
+
 
 ## Variant annotation with Funcotator
 
@@ -494,7 +575,7 @@ CHEK2	11200	__UNKNOWN__	hg38	chr22	28687974	28687974	+	Missense_Mutation	SNP	G	G
 
 ```
 
-Which of these fields seem important?
+**Question:** Which of these fields seem important?
 
 Lots of right answers! Here are some thoughts:
 - Hugo_Symbol: this is the gene name for the gene within which the variant falls. Most geneticists want to talk in terms of impacted gene,
@@ -509,16 +590,18 @@ missense and nonsense.
 
 What gene is the second variant in?
 
+**Answer**
+
 [CHEK2](https://www.ncbi.nlm.nih.gov/gene/11200), which is an important regulator of the cell cycle.
 
 
-What type of variant is the first? And the second?
+**Question:** What type of variant is the first? And the second?
 
-
+**Answer**
 The first variant is an insertion. The second is a SNP.
 
 
-What characteristics of the second variant make it especially important for review and clinical consideration?
+**Question:** What characteristics of the second variant make it especially important for review and clinical consideration?
 
 - It's a missense mutation
 - It's in a gene associated with cell cycle regulation.
