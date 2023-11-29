@@ -35,7 +35,6 @@ The course will be led by experts in cancer genomics from Latin America and the 
 - [Data Formats and QC Exercises](https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/course_data/Module_1/data_formats_exercises.pdf)
 - [Mutation Calling Slides](https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/Modules/02_Mutation_Calling/Somatic_Variant_Calling.pptx)
 - [Mutation Calling Exercises](https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/Modules/02_Mutation_Calling/mutation_calling_exercises.md)
-- [Driver Detection Practical]()
 - [Driver Detection Practical](https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/Modules/Driver_detection/Driver_detection_dndscv_2023.pdf)
 - [maftools Practical](https://htmlpreview.github.io/?https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/Modules/Driver_detection/Maftools_practical.html)
 - [Extra maftools exercises](https://htmlpreview.github.io/?https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/Modules/Driver_detection/Extra_maftools_exercises.html)
