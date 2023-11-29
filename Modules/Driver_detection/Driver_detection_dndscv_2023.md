@@ -672,12 +672,12 @@ affected, amino acid change, the number of times the mutation was
 observed in the data, the number of expected mutations at the site by
 chance, the dN/dS ratio and significance values.
 
-and codondnds\*\*
+### **Using codondnds: selection at specific codons**
 
 **Running codondnds**
 
 We will not run it because it requires creating a new database, which
-can take about 20', but this is how you can do it.
+can take about 20', but this is how one would do it.
 
 ``` r
 data("refcds_hg19", package = "dndscv")
@@ -718,8 +718,7 @@ codon_dnds$recurcodons[which(codon_dnds$recurcodons$qval<0.1),]
 
 ## **Predicting drivers in a given donor using the Cancer Genome Interpreter**
 
-We will use the Cancer Genome Interpreter to predict drivers in one of
-our donors.
+We will use the Cancer Genome Interpreter to predict drivers in one of our donors.
 
 To make it more interesting, each one can select one donor randomly:
 
@@ -759,8 +758,4 @@ GRCh38 are also available here:
 
 ### **Troubleshooting**
 
-You can identify if your data is noisy (variant calling problems) by
-inspecting your dndscv output. If you see a very large excess of
-synonymous mutations (compare observed number of synonymous mutations
-against ) it can be a sign or presence of artefacts or contamination in
-your data.
+You can identify if your data is noisy (variant calling problems) by inspecting your dndscv output. If you see a very large excess of synonymous mutations (compare observed number of synonymous mutations against ) it can be a sign or presence of artefacts or contamination in your data.
