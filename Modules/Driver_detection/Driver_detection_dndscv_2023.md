@@ -758,4 +758,4 @@ GRCh38 are also available here:
 
 ### **Troubleshooting**
 
-You can identify if your data is noisy (variant calling problems) by inspecting your dndscv output. If you see a very large excess of synonymous mutations (compare observed number of synonymous mutations against ) it can be a sign or presence of artefacts or contamination in your data.
+You can identify if your data is noisy (variant calling problems) by inspecting your dndscv output. If you see a very large excess of synonymous mutations (compare observed number of synonymous mutations against the expected) it can be a sign or presence of artefacts or contamination in your data.
