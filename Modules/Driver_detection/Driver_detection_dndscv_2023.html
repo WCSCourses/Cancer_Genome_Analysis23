@@ -368,16 +368,12 @@ code {
 <h1 id="driver-detection-using-dndscv">Driver detection using dndscv</h1>
 <p>Adapted from Federico Abascal's practical</p>
 <h2 id="detection-of-drivers-in-bladder-carcinoma"><strong>Detection of drivers in bladder carcinoma</strong></h2>
-<p>We will be working with a dataset of bladder cancer from the TCGA consortium.</p>
-<p><strong>Generating the input file</strong></p>
-<p>For this practical we already have a prepared input file, but you will usually have to generate it yourself. Have a read on how you can do it from MAF or VCF files.</p>
-<p>dndscv works with an input file that consist of 5 columns.
-1) Sample ID
-2) Chromosome
-3) Position
-4) Reference
-5) Mutation</p>
-<p>We can extract this data from MAF files. For this we can use the MAF columns:</p>
+<p>We will be working with a dataset of bladder cancer from the TCGA
+consortium.</p>
+<h3 id="generating-the-input-file"><strong>Generating the input file</strong></h3>
+<p>dndscv works with an input file that consist of 5 columns. 1) Sample ID
+2) Chromosome 3) Position 4) Reference 5) Mutation</p>
+<p>We can extract this data from MAF files columns:</p>
 <ol>
 <li>Tumor_Sample_Barcode</li>
 <li>Chromosome</li>
@@ -385,18 +381,27 @@ code {
 <li>Reference_Allele</li>
 <li>Tumor_Seq_Allele2</li>
 </ol>
-<p>The input file can also be generated from vcf files using the following columns:</p>
+<p>The input file can also be generated from vcf files using the following
+columns:</p>
 <ol>
-<li>Tumor column (column number can differ based on the tool used to generate the vcf file)</li>
+<li>Tumor column (column number can differ based on the tool used to
+generate the vcf file)</li>
 <li>Chrom</li>
 <li>POS</li>
 <li>REF</li>
 <li>ALT</li>
 </ol>
-<p><strong>Data loading and exploration</strong></p>
-<p>Once we have our data as a 5 column table with a suitable header we should explore our data.</p>
-<p>The input file to use for this practical is <code>TCGA-BLCA.5col</code></p>
-<p>Load the input file</p>
+<p>For this practical we have already prepared an input file for you
+<code>TCGA-BLCA.5col</code>. However, in your own work, you will have to typically
+generate this input file on your own. The easiest way to structure this
+input is by converting your variant calling output (.vcf formatted file)
+to .maf format. (See earlier discussion on the topic)</p>
+<h3 id="data-loading-and-exploration"><strong>Data loading and exploration</strong></h3>
+<p>Once we have an appropriately formatted 5 column input file with a
+suitable header we should load the data and explore it to ensure that
+the data are what we expect them to be and to check for any unexpected
+errors.</p>
+<p><strong>Load the input file</strong></p>
 <pre class="hljs"><code><div><span class="hljs-keyword">library</span>(dndscv)
 muts = read.table(<span class="hljs-string">"TCGA-BLCA.5col"</span>, header=<span class="hljs-literal">T</span>, sep=<span class="hljs-string">"\t"</span>, stringsAsFactors=<span class="hljs-literal">F</span>)
 head(muts)
@@ -409,7 +414,7 @@ head(muts)
 ## 5 TCGA-2F-A9KO  10 118666167   C   T
 ## 6 TCGA-2F-A9KO  10  12043694   C   G
 </div></code></pre>
-<p>To count the number of samples we can do:</p>
+<p>To count the number of samples we can run the following command:</p>
 <pre class="hljs"><code><div>length(unique(muts$sampleID))
 </div></code></pre>
 <pre class="hljs"><code><div><span class="hljs-comment">## [1] 370</span>
@@ -419,13 +424,34 @@ head(muts)
 </div></code></pre>
 <pre class="hljs"><code><div><span class="hljs-comment">## [1] 53518</span>
 </div></code></pre>
+<p>There are <code>370</code> donors and a total of <code>5318</code> mutations.</p>
 <p>To see the mutational burden per sample we can do the following:</p>
-<pre class="hljs"><code><div>barplot(sort(table(muts$sampleID)),ylab=<span class="hljs-string">"Number of mutations"</span>,xlab=<span class="hljs-string">"Donors"</span>,las=<span class="hljs-number">2</span>,names.arg=<span class="hljs-string">""</span>)
+<pre class="hljs"><code><div>barplot(sort(table(muts$sampleID)), ylab=<span class="hljs-string">"Number of mutations"</span>, xlab=<span class="hljs-string">"Donors"</span>, las=<span class="hljs-number">2</span>, names.arg=<span class="hljs-string">""</span>)
 </div></code></pre>
-<p>It is relevant to explore our data in this way because hypermutators can have a negative impact on the statistical power to detect drivers and it would be better to exclude those samples. Although there is no exact definiton of a hypermutator, usually having more than 500 mutations can be considered a hypermutator.</p>
+<blockquote>
+<p><strong>Are there any hypermutators in the cohort?</strong></p>
+</blockquote>
+<p><em>*t is relevant to explore our data in this way because hypermutators
+can have a negative impact on the statistical power to detect drivers
+and because some hypermutators (e.g. POLE mutant tumors) are under
+mutational processes not properly modeled by a
+trinucleotide-substitution model. Although there is no exact definition
+of a hypermutator, usually having more than 500 mutations in the exome
+(approximately 5.6810^{4} mutations in the whole genome) can be
+considered a hypermutator. In general, it is good to exclude these
+samples from this analysis.</em></p>
+<pre class="hljs"><code><div></div></code></pre>
+<hr>
 <h2 id="driver-detection"><strong>Driver detection</strong></h2>
-<p>We will run the dndscv removing hypermutators (n&gt;500) and samples that have more than 3 mutations in a given gene (to protect against loss of sensitivity from clustered artefacts)</p>
-<pre class="hljs"><code><div>dout = dndscv(muts, max_muts_per_gene_per_sample=<span class="hljs-number">3</span>,max_coding_muts_per_sample=<span class="hljs-number">500</span>,outmats=<span class="hljs-literal">T</span>)
+<p>We will run dndscv to detect drivers in bladder cancer removing
+hypermutators (n&gt;500)</p>
+<ul>
+<li>samples that have more than 3 mutations in a given gene (to protect
+against loss of sensitivity from clustered artefacts)</li>
+</ul>
+<h3 id="gene-level-signals-of-selection"><strong>Gene level signals of selection</strong></h3>
+<pre class="hljs"><code><div><span class="hljs-comment"># analyses of selection using the dNdScv and dNdSloc models</span>
+dout = dndscv(muts, max_muts_per_gene_per_sample=<span class="hljs-number">3</span>,max_coding_muts_per_sample=<span class="hljs-number">50</span>,      outmats=<span class="hljs-literal">T</span>)
 </div></code></pre>
 <pre class="hljs"><code><div>## [1] Loading the environment...
 ## [2] Annotating the mutations...
@@ -446,19 +472,37 @@ head(muts)
 ## 2: In dndscv(muts, max_muts_per_gene_per_sample = 3, max_coding_muts_per_sample = 500,  :
 ##   43 (0.093%) mutations have a wrong reference base (see the affected mutations in dndsout$wrongmuts). Please identify the causes and rerun dNdScv.
 </div></code></pre>
-<p>While running dndscv you will see some warnings. One of them reads &quot;Same mutations observed in different sampleIDs. Please verify that these are independent events and remove duplicates otherwise.&quot; This warning relates to that only unique mutations are listed in the input file. For example if your input contains the same mutation in several related samples (samples that come from the same tumor) they shoul only be listed once in the file.</p>
-<p>You will also see a warning indicating that some mutations have a wrong reference. This is because of a error in the original TCGA file. We can ignore this as the number of affected bases is very small.</p>
+<p>While running dndscv you will see some warnings. One of them reads &quot;Same
+mutations observed in different sampleIDs. Please verify that these are
+independent events and remove duplicates otherwise.&quot; This warning
+relates to that only unique mutations are listed in the input file. For
+example if your input contains the same mutation in several related
+samples (samples that come from the same tumor) they should only be
+listed once in the file.</p>
+<p>You will also see a warning indicating that some mutations have a wrong
+reference. This is because of a error in the original TCGA file. We can
+ignore this as the number of affected bases is very small.</p>
 <p><strong>Looking at the output</strong></p>
-<p>dndscv generates a list of objects as output. You can look at the contents of the list like this.</p>
+<p>dndscv generates a list of objects as output. You can look at the
+contents of the list like this.</p>
 <pre class="hljs"><code><div>names(dout)
 </div></code></pre>
 <pre class="hljs"><code><div><span class="hljs-comment">## [1] "globaldnds"   "sel_cv"       "sel_loc"      "annotmuts"    "genemuts"    </span>
 <span class="hljs-comment">## [6] "mle_submodel" "exclsamples"  "exclmuts"     "nbreg"        "nbregind"    </span>
 <span class="hljs-comment">## [11] "poissmodel"   "wrongmuts"    "N"            "L"           </span>
 </div></code></pre>
-<p>The most relevant output often is <code>sel_cv</code> as it contains the results of the neutrality tests at gene level. The <code>globaldnds</code> output has a table with global MLEs for the dN/dS ratios across all genes and their confidence intervals. The <code>annotmuts</code> output contains a tbale with annotated coding mutations. <code>genemuts</code> has a table with observed and expected number of mutations per gene.</p>
-<p>We can look at the significant genes in the table <code>sel_cv</code>
-Here we will filter for genes with a <code>qglobal_cv &lt; 0.1</code>. This qglobal is the multiple hypothesis correction q-value for the pglobal_cv.</p>
+<p>The most relevant output often is <code>sel_cv</code> as it contains the results of
+the neutrality tests at gene level. The <code>globaldnds</code> output has a table
+with global MLEs for the dN/dS ratios across all genes and their
+confidence intervals. The <code>annotmuts</code> output contains a table with
+annotated coding mutations. <code>genemuts</code> has a table with observed and
+expected number of mutations per gene.</p>
+<h4 id="table-of-significant-genes"><strong>Table of significant genes</strong></h4>
+<p><code>dout$sel_cv</code> contains the results for all the analyzed genes.</p>
+<p>We can look at the significant genes in the table by filtering for genes
+with a <code>qglobal_cv &lt; 0.1</code>. <code>qglobal</code> is the multiple hypothesis
+correction q-value for the <code>pglobal_cv</code> (the combined p-value for the
+different p-values calculated.</p>
 <pre class="hljs"><code><div>dout$sel_cv[which(dout$sel_cv$qglobal_cv&lt;<span class="hljs-number">0.1</span>),]
 </div></code></pre>
 <pre class="hljs"><code><div>##             gene_name n_syn n_mis n_non n_spl n_ind   wmis_cv    wnon_cv
@@ -564,14 +608,57 @@ Here we will filter for genes with a <code>qglobal_cv &lt; 0.1</code>. This qglo
 ## 5817  4.468664e-02 9.023868e-01 5.137110e-02 1.014346e-04 6.368507e-02
 ## 15211 4.576747e-03 9.023868e-01 1.062614e-02 1.438352e-04 8.756946e-02
 </div></code></pre>
-<p>The sel_cv table contains data about the number of mutations of each class for each gene, the coefficients of selection for mutations of each class (w) and values of statistical significance.</p>
-<p><em>How many significant genes do you find?</em></p>
-<p><em>Is there any gene under negative selection?</em></p>
-<p><em>Which genes are oncogenes ? Which genes are tumor suppressors?</em> (TIP: look at the types of mutations and their numbers)</p>
-<p><em>Considering the coefficient of selection for missense mutations in ARID1A, how many missense mutations had been selected for in this cohort?</em>
-Tip: the coefficient wmis_cvis 4.4825244 and there are 21 missense mutations in ARID1A.
-Tip 2: (w-1)/w gives the proportion under positive selection. Tip 3: 95% confindence intervals for the selection coefficients can be obtained with geneci(dout,gene_list=&quot;ARID1A&quot;).
-Tip 4: Have a look at <code>genemuts</code> to see how many mutations were expected</p>
+<p>The <code>sel_cv</code> table contains <code>3</code> types of columns:</p>
+<ul>
+<li>
+<p>the data: the number of mutations of each class for each gene</p>
+</li>
+<li>
+<p>the coefficients of selection for mutations of each mutation class
+<em>(w)</em></p>
+</li>
+<li>
+<p>the associated statistical significance values each mutation class
+<em>(p and q values) for each class</em></p>
+</li>
+</ul>
+<blockquote>
+<p><strong>How many significant genes do you find?</strong></p>
+</blockquote>
+<pre class="hljs"><code><div></div></code></pre>
+<blockquote>
+<p><strong>Is there any gene under negative selection?</strong></p>
+</blockquote>
+<pre class="hljs"><code><div></div></code></pre>
+<blockquote>
+<p><strong>Which genes are oncogenes? Which genes are tumor suppressors?</strong></p>
+</blockquote>
+<ul>
+<li><em>Tip: look at the number and types of mutations n_syn, n_mis.......</em></li>
+</ul>
+<pre class="hljs"><code><div></div></code></pre>
+<blockquote>
+<p><strong>Considering the coefficient of selection for missense mutations in
+<em>ARID1A</em> how many missense mutations had been selected for in this
+cohort?</strong></p>
+</blockquote>
+<ul>
+<li>
+<p><em>Tip: the coefficient wmis_cvis 4.4825244 and there are 21 missense
+mutations in*ARID1A.</em></p>
+</li>
+<li>
+<p><em>Tip 2: (w-1)/w gives the proportion under positive selection.</em></p>
+</li>
+<li>
+<p><em>Tip 3: 95% confidence intervals for the selection coefficients can
+be obtained with <code>geneci(dout,gene_list=&quot;ARID1A&quot;)</code>.</em></p>
+</li>
+<li>
+<p><em>Tip 4: Have a look at <code>genemuts</code> to see how many mutations were
+expected*</em></p>
+</li>
+</ul>
 <pre class="hljs"><code><div>dout$genemuts[which(dout$genemuts$gene_name==<span class="hljs-string">"ARID1A"</span>),]
 </div></code></pre>
 <pre class="hljs"><code><div><span class="hljs-comment">##      gene_name n_syn n_mis n_non n_spl  exp_syn  exp_mis   exp_non  exp_spl</span>
@@ -579,8 +666,11 @@ Tip 4: Have a look at <code>genemuts</code> to see how many mutations were expec
 <span class="hljs-comment">##      exp_syn_cv</span>
 <span class="hljs-comment">## 1465   1.986097</span>
 </div></code></pre>
-<p><em>Are all those missense mutations under selection? Why could this be important when looking at the mutations in a given tumour?</em></p>
-<p>Let's take a look at the mutations in PIK3CA:</p>
+<blockquote>
+<p><strong>Are all those missense mutations under selection?</strong></p>
+</blockquote>
+<pre class="hljs"><code><div></div></code></pre>
+<p>Let's take a look at the mutations in <em>PIK3CA</em>:</p>
 <pre class="hljs"><code><div>dout$annotmuts[which(dout$annotmuts$gene==<span class="hljs-string">"PIK3CA"</span>),]
 </div></code></pre>
 <pre class="hljs"><code><div>          sampleID chr       pos ref mut   gene strand ref_cod mut_cod ref3_cod
@@ -676,7 +766,11 @@ Tip 4: Have a look at <code>genemuts</code> to see how many mutations were expec
 53285      TAA    E542K   G1624A  GAA&gt;AAA   Missense ENSP00000263967
 53506      CAA     R88Q    G263A  CGA&gt;CAA   Missense ENSP00000263967
 </div></code></pre>
-<p>Look at the aachange column to see the amino acid changes generated by the mutations. <em>Is there any recurrent mutation (hotspot)? What does that tell us ?</em></p>
+<p>Look at the aachange column to see the amino acid changes generated by
+the mutations.</p>
+<blockquote>
+<p><strong>Is there any recurrent mutation (hotspot)?</strong></p>
+</blockquote>
 <pre class="hljs"><code><div>PIK3CA = dout$annotmuts[which(dout$annotmuts$gene==<span class="hljs-string">"PIK3CA"</span>),]
 table(PIK3CA$aachange)
 </div></code></pre>
@@ -687,8 +781,9 @@ table(PIK3CA$aachange)
   R88Q   R93Q   S66C  V636L 
      1      1      1      1 
 </div></code></pre>
-<p><strong>Global signals of selection</strong></p>
-<p>dndscv also estimates global dN/dS ratios in the aggregate of all genes. You can access this data in the dndscv output.</p>
+<h3 id="global-signals-of-selection"><strong>Global signals of selection</strong></h3>
+<p>dndscv also estimates global dN/dS ratios in aggregate for all the
+genes. You can access this data in the dndscv output:</p>
 <pre class="hljs"><code><div>print(dout$globaldnds)
 </div></code></pre>
 <pre class="hljs"><code><div>     name       mle     cilow    cihigh
@@ -698,14 +793,35 @@ wspl wspl 0.7915522 0.7297038 0.8586429
 wtru wtru 1.1045772 1.0612096 1.1497171
 wall wall 1.0629959 1.0398517 1.0866553
 </div></code></pre>
-<p><em>Is there evidence of positive or negative selection?</em></p>
-<p>wspl is negative. That could mean negative selection but this result is often obtained with exomes data because of the poorer sequencing coverage at splice sites. dndscv interprets the depletion of mutations at splice sites as negative selection.</p>
-<p>However all the other coefficients are &gt; 1 and their 95% confidence intervals too.</p>
-<p>We can use the globaldnds information to estimate the number of missense driver mutations per sample.</p>
-<p>There are 30610 missense mutations in the cohort, and the coefficient of selection wmis is 1.0524348.</p>
-<p><em>Calculate the proportion of missense mutations under positive selection using the formula</em> <code>(w-1)/w</code></p>
-<p><em>Find out the actual number of missense mutations under positive selection:</em> <code>n_mis * (w-1)/w</code></p>
-<p><em>Calculate the average per sample:</em> <code>( n_mis * (w-1)/w ) / num_samples</code></p>
+<blockquote>
+<p><strong>Is there evidence of positive or negative selection?</strong></p>
+</blockquote>
+<p><code>wspl</code> is lower than 1. That could mean negative selection but this
+result is often obtained with exome data because of the poorer
+sequencing coverage at splice sites. <code>dndscv</code> interprets the depletion
+of mutations at splice sites as negative selection.</p>
+<p>However all the other coefficients are &gt; 1 and their 95% confidence
+intervals too.</p>
+<p>We can use the <code>globaldnds</code> information to estimate the number of
+missense driver mutations per sample.</p>
+<ul>
+<li>
+<p>There are 30610 missense mutations in the cohort, and the
+coefficient of selection <code>wmis</code> is 1.0524348.</p>
+</li>
+<li>
+<p>Calculate the proportion of missense mutations under positive
+selection using the formula* <code>(w-1)/w</code></p>
+</li>
+<li>
+<p>Find out the actual number of missense mutations under positive
+selection: <code>n_mis * (w-1)/w</code></p>
+</li>
+<li>
+<p>Calculate the average per sample:
+<code>( n_mis * (w-1)/w ) / num_samples</code></p>
+</li>
+</ul>
 <p>You can obtain all the info with:</p>
 <pre class="hljs"><code><div>w = dout$globaldnds[<span class="hljs-number">1</span>,<span class="hljs-number">2</span>]
 
@@ -713,10 +829,16 @@ n_mis = length(which(dout$annotmuts$impact==<span class="hljs-string">"Missense"
 
 num_samples = length(table(unique(muts$sampleID)))
 </div></code></pre>
-<h2 id="analysis-of-hotspots"><strong>Analysis of hotspots</strong></h2>
-<p>We will now look for signals of positive selection at specific DNA or protein sites.</p>
-<p>Firstly, have a look at the annotmuts output and try to determine by eye if there are hotspots. A couple lines of code which may help with the task:</p>
-<pre class="hljs"><code><div>dout$annotmuts$gene_and_aachange = paste(dout$annotmuts$gene,dout$annotmuts$aachange,dout$annotmuts$ntchange,dout$annotmuts$pos,dout$annotmuts$impact,sep=<span class="hljs-string">":"</span>)
+<h2 id="sitecodon-level-signals-of-selection"><strong>Site/Codon level signals of selection</strong></h2>
+<h3 id="analysis-of-hotspots"><strong>Analysis of hotspots</strong></h3>
+<p>We will now look for signals of positive selection at specific DNA or
+protein sites.</p>
+<p>Firstly, have a look at the <code>annotmuts</code> output and try to determine by
+eye if there are hotspots. A couple lines of code which may help with
+the task:</p>
+<pre class="hljs"><code><div>
+dout$annotmuts$gene_and_aachange = paste(dout$annotmuts$gene, dout$annotmuts$aachange, dout$annotmuts$ntchange, dout$annotmuts$pos, dout$annotmuts$impact, sep=<span class="hljs-string">":"</span>)
+
 sort(table(dout$annotmuts$gene_and_aachange),decreasing=<span class="hljs-literal">T</span>)[<span class="hljs-number">1</span>:<span class="hljs-number">10</span>]
 </div></code></pre>
 <pre class="hljs"><code><div>    FGFR3:S249C:C746G:1803568:Missense      TP53:R248Q:G743A:7577538:Missense 
@@ -730,17 +852,29 @@ PIK3CA:E545K:G1633A:178936091:Missense PIK3CA:E542K:G1624A:178936082:Missense
      TP53:R280T:G839C:7577099:Missense    C3orf70:S6L:C17T:184870595:Missense 
                                      5                                      4 
 </div></code></pre>
-<p>Go to the COSMIC database to gather further information about these hotspots. For example:</p>
-<p>FGFR3 https://cancer.sanger.ac.uk/cosmic/gene/analysis?ln=FGFR3</p>
+<p>Go to the COSMIC database to gather further information about these
+hotspots. For example:</p>
+<p>FGFR3 <a href="https://cancer.sanger.ac.uk/cosmic/gene/analysis?ln=FGFR3">https://cancer.sanger.ac.uk/cosmic/gene/analysis?ln=FGFR3</a></p>
 <p>Look at other hotspots, the domain structure, the 3D structure</p>
-<p>The Hallmarks of Cancer has also valuable information on drivers: https://cancer.sanger.ac.uk/cosmic/census-page/FGFR3</p>
-<p><em>Do you think hotspots are more frequent in oncogenes or in tumour suppressors?</em></p>
-<h2 id="using-sitednds-and-codondnds"><strong>Using sitednds and codondnds</strong></h2>
-<p>sitednds looks for selection (mutation recurrence over random expectations) at specific DNA positions, while codondnds looks for selection at codons. Each method may be more sensitive for different kinds of hotspots, hence we recommend trying both.</p>
+<p>The Hallmarks of Cancer has also valuable information on drivers:
+<a href="https://cancer.sanger.ac.uk/cosmic/census-page/FGFR3">https://cancer.sanger.ac.uk/cosmic/census-page/FGFR3</a></p>
+<blockquote>
+<p><strong>Do you think hotspots are more frequent in oncogenes or in tumour
+suppressors?</strong></p>
+</blockquote>
+<pre class="hljs"><code><div></div></code></pre>
+<h3 id="using-sitednds-selection-at-specific-sites"><strong>Using sitednds: selection at specific sites</strong></h3>
 <p><strong>Running sitednds</strong></p>
-<p>One of the limitations of sitednds is that artefacts and contamiation are common y cancer datasets and can generate false positive mutation calls. To reduce the risk of false positives and increase the signal to noise ratio, we will only consider mutations in Cancer Gene Census genes (v81).</p>
-<p>The sitednds function takes the output of dndscv as input. In order for the dndsout object to be compatible with sitednds we must use the &quot;outmats=T&quot; argument in dndscv.</p>
-<pre class="hljs"><code><div>data(<span class="hljs-string">"cancergenes_cgc81"</span>, package=<span class="hljs-string">"dndscv"</span>) <span class="hljs-comment"># Loading the genes in the Cancer Gene Census (v81)</span>
+<p>One of the limitations of <code>sitednds</code> is that artefacts and contamination
+are common in cancer datasets and can generate false positive mutation
+calls. To reduce the risk of false positives and increase the signal to
+noise ratio, we will only consider mutations in Cancer Gene Census genes
+(v81).</p>
+<p>The <code>sitednds</code> function takes the output of <code>dndscv</code> as input. In order
+for the <code>dndsout</code> object to be compatible with sitednds we must use the
+<code>&quot;outmats=T&quot;</code> argument in <code>dndscv</code>.</p>
+<pre class="hljs"><code><div><span class="hljs-comment"># Load the the Cancer Gene Census (v81) genes</span>
+data(<span class="hljs-string">"cancergenes_cgc81"</span>, package=<span class="hljs-string">"dndscv"</span>)
 dout_cancergenes = dndscv(muts, outmats=<span class="hljs-literal">T</span>, gene_list=known_cancergenes)
 </div></code></pre>
 <pre class="hljs"><code><div>[1] Loading the environment...
@@ -760,8 +894,11 @@ Warning messages:
       Genes were excluded from the indel background model based on the substitution data: TP53, PIK3CA, ARID1A, KMT2D, RB1, KDM6A, FGFR3, STAG2, RHOA, PTEN, CDKN2A.p16INK4a, KRAS, ERBB2, CDKN2A.p14arf, FAT1, CREBBP, HRAS, FBXW7, ARID2, KMT2A, ERBB3, EP300.
 </div></code></pre>
 <pre class="hljs"><code><div>sout = sitednds(dout_cancergenes)
-names(sout)
 </div></code></pre>
+<p>The output list contains the following objects:</p>
+<pre class="hljs"><code><div>names(sout)
+</div></code></pre>
+<p><code>recursites</code> has information on the significant sites</p>
 <pre class="hljs"><code><div>[1] &quot;recursites&quot;     &quot;overdisp&quot;       &quot;fpr_nonsyn_q05&quot; &quot;LL&quot; 
 </div></code></pre>
 <pre class="hljs"><code><div>sout$recursites[which(sout$recursites$qval&lt;<span class="hljs-number">0.1</span>),]
@@ -794,11 +931,15 @@ names(sout)
 11 0.0056141654   890.6043 2.353526e-08 1.036420e-02
 12 0.0033636803  1189.1736 6.200800e-08 2.503087e-02
 13 0.0011948375  2510.8016 9.538711e-08 3.554314e-02
-
 </div></code></pre>
-<p>This output shows the hotspots studied, their position, the gene affected, amino acid change, the number of times teh mutations was observed in the data, the number of expected mutations at the site by chance, the dN/dS ratio and significance values.</p>
+<p>This output shows the hotspots studied, their position, the gene
+affected, amino acid change, the number of times the mutation was
+observed in the data, the number of expected mutations at the site by
+chance, the dN/dS ratio and significance values.</p>
+<h3 id="using-codondnds-selection-at-specific-codons"><strong>Using codondnds: selection at specific codons</strong></h3>
 <p><strong>Running codondnds</strong></p>
-<p>We will not run it because it requires creating a new database, which can take about 20', but this is how you can do it.</p>
+<p>We will not run it because it requires creating a new database, which
+can take about 20', but this is how one would do it.</p>
 <pre class="hljs"><code><div>data(<span class="hljs-string">"refcds_hg19"</span>, package = <span class="hljs-string">"dndscv"</span>)
 RefCDS_codon = buildcodon(RefCDS)
 codon_dnds = codondnds(dout_cancergenes, RefCDS_codon, theta_option=<span class="hljs-string">"conservative"</span>, min_recurr=<span class="hljs-number">2</span>)
@@ -824,23 +965,40 @@ codon_dnds$recurcodons[which(codon_dnds$recurcodons$qval&lt;<span class="hljs-nu
 14  12         ERBB3  V104    3 0.0042258838  709.9107 1.292705e-06 4.847876e-02
 15   9 CDKN2A.p14arf   A97    2 0.0008437944 2370.2457 2.705783e-06 9.470692e-02
 </div></code></pre>
+<blockquote>
+<p><code>sitednds</code> looks for selection (mutation recurrence over random
+expectations) at specific DNA positions, while <code>codondnds</code> looks for
+selection at codons. Each method may be more sensitive for different
+kinds of hotspots, hence we recommend trying both.</p>
+</blockquote>
 <h2 id="predicting-drivers-in-a-given-donor-using-the-cancer-genome-interpreter"><strong>Predicting drivers in a given donor using the Cancer Genome Interpreter</strong></h2>
 <p>We will use the Cancer Genome Interpreter to predict drivers in one of our donors.</p>
 <p>To make it more interesting, each one can select one donor randomly:</p>
 <pre class="hljs"><code><div>random_donor = sample(unique(muts$sampleID),<span class="hljs-number">1</span>)
-muts_in_random_donor = muts[which(muts$sampleID == random_donor),c(<span class="hljs-string">"chr"</span>,<span class="hljs-string">"pos"</span>,<span class="hljs-string">"ref"</span>,<span class="hljs-string">"mut"</span>)]
+muts_in_random_donor = muts[which(muts$sampleID == random_donor), c(<span class="hljs-string">"chr"</span>,<span class="hljs-string">"pos"</span>,<span class="hljs-string">"ref"</span>,<span class="hljs-string">"mut"</span>)]
 cat(random_donor, <span class="hljs-string">" donor has "</span>,nrow(muts_in_random_donor), <span class="hljs-string">" mutations\n"</span>,sep=<span class="hljs-string">""</span>)
 </div></code></pre>
-<pre class="hljs"><code><div>write.table(muts_in_random_donor, file=paste(random_donor,<span class="hljs-string">".tsv"</span>,sep=<span class="hljs-string">""</span>),col.names=<span class="hljs-literal">F</span>,row.names=<span class="hljs-literal">F</span>,quote=<span class="hljs-literal">F</span>)
+<pre class="hljs"><code><div>write.table(muts_in_random_donor, file=paste(random_donor,<span class="hljs-string">".tsv"</span>,sep=<span class="hljs-string">""</span>), col.names=<span class="hljs-literal">F</span>, row.names=<span class="hljs-literal">F</span>, quote=<span class="hljs-literal">F</span> )
 </div></code></pre>
-<p>Copy those mutations and paste them here: https://www.cancergenomeinterpreter.org/analysis</p>
-<p>Select hg19 as &quot;Reference genome&quot; and click &quot;Run&quot;. The analysis will take a few minutes.</p>
-<p>You can also explore bladder cancer at Intogen: https://www.intogen.org/search There you would find 78 drivers defined for bladder cancer</p>
+<p>Copy those mutations and paste them here:
+<a href="https://www.cancergenomeinterpreter.org/analysis">https://www.cancergenomeinterpreter.org/analysis</a></p>
+<p>Select hg19 as &quot;Reference genome&quot; and click &quot;Run&quot;. The analysis will
+take a few minutes.</p>
+<p>You can also explore bladder cancer at Intogen:
+<a href="https://www.intogen.org/search">https://www.intogen.org/search</a> There you would find 78 drivers defined
+for bladder cancer</p>
 <h2 id="other-useful-tips"><strong>Other useful tips</strong></h2>
-<p>dndscv uses by default data from the GRCh37/hg19 assembly. If you need to use a different assembly or a different speceies you can create a new reference database (RefCDS object).
-A tutorial to do so can be found here http://htmlpreview.github.io/?http://github.com/im3sanger/dndscv/blob/master/vignettes/buildref.html</p>
-<p>Pre-made reference databases for other popular assemblies such as the GRCh38 are also available here https://github.com/im3sanger/dndscv_data/tree/master/data</p>
-<p>You can identify if your data is noisy ( variant calling problems) looking at dndscv output. If you see a very large excess of synonymous mutations (compare observed number of synonymous mutations against ) it can be a sign or presence of artefacts or contamination in your data.</p>
+<h3 id="reference-genomes"><strong>Reference Genomes</strong></h3>
+<p>By default dndscv uses the GRCh37/hg19 reference genome assembly. If you
+need to use a different assembly or a different species you can create a
+new reference database (RefCDS object). A tutorial to do so can be found
+here:
+<a href="http://htmlpreview.github.io/?http://github.com/im3sanger/dndscv/blob/master/vignettes/buildref.html">http://htmlpreview.github.io/?http://github.com/im3sanger/dndscv/blob/master/vignettes/buildref.html</a></p>
+<p>Pre-made reference databases for other popular assemblies such as the
+GRCh38 are also available here:
+<a href="https://github.com/im3sanger/dndscv_data/tree/master/data">https://github.com/im3sanger/dndscv_data/tree/master/data</a></p>
+<h3 id="troubleshooting"><strong>Troubleshooting</strong></h3>
+<p>You can identify if your data is noisy (variant calling problems) by inspecting your dndscv output. If you see a very large excess of synonymous mutations (compare observed number of synonymous mutations against the expected) it can be a sign or presence of artefacts or contamination in your data.</p>
 
 </body>
 </html>
