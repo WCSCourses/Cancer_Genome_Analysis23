@@ -1,0 +1,323 @@
+---
+title: "Deconvolution Analysis with CIBERSORT"
+author: "Cristiane Esteves, Mariana Boroni - Bioinformatics and Computational Biology
+  Lab (LBBC/INCA-RJ)"
+data: "2022-08-01"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r}
+#Set your work directory
+setwd("~/Cancer_Genomics_Course/Modules/RNA_Deconvolution/Data_Deconvolution/")
+```
+
+```{r}
+#Load Packages
+suppressPackageStartupMessages({
+  library(tibble)
+  library(dplyr)
+  library(ggplot2)
+  library(survival)
+  library(survminer)
+  library(e1071)
+  library(data.table)
+  library(RColorBrewer)
+  library(readr)
+  library(reshape2)
+})
+
+#Load script CIBERSORT and barplot functions
+source('bin/CIBERSORT.R')
+source('bin/barplot_cibersort.R')
+
+```
+##Deconvolution Analysis - CIBERSORT
+
+CIBERSORT is a deconvolution-based method that uses the v-support vector regression method (v-SVR) to estimate each immune cell type’s relative proportion from a gene expression profile. It requires an input of reference gene expression signatures. CIBERSORT provides a gene signature matrix (LM22.txt)(https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4739640/). The file contains expression counts for 547 signature genes (547 rows) for 22 distinct human immune cells (22 columns).  
+
+The CIBERSORT source code and LM22 signature matrix are only freely available to academic users – register for access on the CIBERSORT website .
+
+```{r}
+#load the LM22 signatures
+lm22_signatures <- as.data.frame(fread("data/lm22.txt"))
+lm22_signatures <- tibble::column_to_rownames(lm22_signatures, "V1")
+#Print the first six rows of LM22 signatures dataframe
+print(head(lm22_signatures[,1:4]))
+#Print cell types present in the Lm22 signature
+colnames(lm22_signatures)
+```
+In this exercise, we will predict cell types in Bulk RNA matrix (SKCM-Metastasis). As input, we will use The Cancer Genome Atlas (TCGA) expression dataset from metastatic skin melanoma (TCGA-SKCM) as input. The file provided for this exercise have already been filtered to only contain genes that will be used by CIBERSORT.
+Obs.: The gene names must always be in the rownames, and it should match the reference. 
+
+```{r}
+#Load the Bulk RNA TCGA-SKCM metastatic expression dataframe 
+#This dataframe has been alread filtered to only contain genes from lm22 signature that will be used by cibersort)
+skcm_bulk <- as.data.frame(fread("data/bulk.txt"))
+skcm_bulk <- tibble::column_to_rownames(skcm_bulk, "V1")
+#Here we printing the first six rows of Bulk RNA TCGA-SKCM dataframe
+print(head(skcm_bulk[,1:4]))
+```
+CIBERSORT parameters:
+
+i)   perm = No. permutations; set to >=100 to calculate p-values (default = 0).
+ii)  QN = Quantile normalization of input Patient_ID (default = TRUE) - (disabling is recommended for RNA-Seq data).
+iii) absolute = Run CIBERSORT in absolute mode (default = FALSE). 
+The CIBERSORT absolute mode scales cellular fractions to a score that reflects each cell type’s absolute proportion, allowing comparison across both samples and cell types.
+                 
+```{r}
+# Here we are setting the seed to maintain the reproducibility of the results.
+set.seed(42)
+h1 <- Sys.time()
+#Run CIBERSORT
+#results.cibersort <- CIBERSORT(lm22_signatures, skcm_bulk, perm = 1, absolute = T, QN = F) #it is important to always use 100 or more permutations ("perm" parameter) but for didactic purposes, we will use perm = 1.
+h2 <- Sys.time()
+print(h2 - h1)
+
+#Filter for the significant predictions
+#results.sign = as.data.frame(results.cibersort)[which(as.data.frame(results.cibersort)$`P-value` <= 0.05),]
+#results.sign = results.sign[1:22]
+```
+
+```{r}
+#for a interest of time, we will upload a pre-computed result
+results.sign <- readRDS("data/results_cibersort_perm100.rds")
+
+head(results.sign)
+```
+
+```{r}
+# Transforming the data
+results.sign$Patient_ID <- rownames(results.sign)
+
+# Melting the data frame to long format for ggplot
+results.sign_melt <- reshape2::melt(results.sign, id.vars = "Patient_ID", measure.vars = colnames(results.sign)[1:22])
+
+# Choosing One Patient ID to plot
+Patient_ID_indx <- results.sign_melt$Patient_ID == results.sign_melt$Patient_ID[1]
+
+# Creating a 22 color palette
+my_palette <- colorRampPalette(rainbow(22)) # Creating the palette function
+palette_colors <- my_palette(22) # Generating 22 colors
+
+# Plotting the cell types estimation for one sample
+ggplot(results.sign_melt[Patient_ID_indx, ], aes(x = variable, y = value, fill = variable)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  scale_fill_manual(values = palette_colors) +  # Applying the palette colors
+  ggtitle(paste("Cell Type Predictions for Patient", results.sign_melt$Patient_ID[1])) +
+  theme_minimal() +
+  xlab("Cell Type") +
+  ylab("Estimated Proportion")
+
+
+```
+
+## Association of cell types prediction and clinical outcomes
+
+In the next section of our R Markdown document, we're going to explore an exciting and crucial aspect of cancer research: the integration of cell type predictions from CIBERSORT with clinical data from TCGA. This step is vital as it allows us to understand how different cellular compositions in the tumor microenvironment relate to clinical outcomes. By associating specific cell types, as predicted by CIBERSORT, with various clinical parameters and patient data from TCGA, we can uncover valuable insights into how these cells influence the progression, treatment response, and overall prognosis of cancer.
+
+```{r}
+library(readr)
+
+# Load Metastatic Melanoma (SKCM-TCGA) Clinical and Survival dataset
+
+#data_SKCM a list format object that contains a dataframe of clinical and survival data
+data_SKCM = readRDS("data/data_SKCM.rds")
+head(data_SKCM$survival_met)
+
+#Load the informations of the type molecular of tumor for each patient
+subtypes <- read_csv("data/subtipos.csv", show_col_types = F)
+head(subtypes)
+```
+
+
+```{r}
+#We need unique patient IDs  in rownames (in this dataset there is more than one sample per patient).
+results.sign$Patient_ID <- rownames(results.sign)
+
+#the gsub function will help us to replace the existing dots (.) in patient IDs to a dash (-).
+results.sign$Patient_ID <- gsub("\\.", "-", results.sign$Patient_ID)
+#Keep the first 12 characters of the patient ID.
+results.sign$Patient_ID <- substr(results.sign$Patient_ID,1,12)
+
+#Aggregate Cibersort result with clinical and survival data according to patient ID
+forest_data <- left_join(results.sign,data_SKCM$survival_met[,c(1,8,16,17,2,5)], by= c("Patient_ID" = "bcr_patient_barcode"))
+forest_data <- left_join(forest_data,subtypes[,c(2,10)], by= c("Patient_ID" = "pan.samplesID"))
+
+#rename column to "Subtype_Mutation"
+colnames(forest_data)[29] = "Subtype_Mutation"
+```
+### Plot Proportions of cell types predicted by Cibersort and compare between groups 
+
+```{r fig.height=10, fig.width=15}
+# Make Patient_ID column (Patient IDs from cibersort result table) as first column
+res_cibersort = forest_data[, c("Patient_ID", colnames(forest_data)[1:22])]
+res_cibersort$Patient_ID <- make.names(res_cibersort$Patient_ID, unique = T)
+res_cibersort$Patient_ID <- gsub("\\.", "-", res_cibersort$Patient_ID)
+
+# Check the columns (variable names) present in the clinical dataset
+names(forest_data)
+
+## Lets create annotation data that will be also used to plot the final figure
+#Filter for columns sample and Subtype mutation
+data_barplot = forest_data[,c(23,29)]
+
+#Make patient IDs unique values
+data_barplot$Patient_ID <- make.names(data_barplot$Patient_ID, unique = T)
+data_barplot$Patient_ID <- gsub("\\.", "-", data_barplot$Patient_ID)
+
+# Put patient IDs in rownames
+rownames(data_barplot) = data_barplot$Patient_ID
+data_barplot$Patient_ID = NULL
+
+# Add `NA` in empty fields
+data_barplot$Subtype_Mutation[which(is.na(data_barplot$Subtype_Mutation))] <- "nan"
+data_barplot$Subtype_Mutation[which(data_barplot$Subtype_Mutation == "-")] <- "nan"
+
+
+#Plot the barplot: in which each column we have  a patient with the clinical informations on the first row (Subtype mutation, for example, colored according to legend colors) and each bar is divided by the proportion o immune cells types predicted by cibersort. 
+
+plot.ciber.heat(ciber.obj = res_cibersort, ann_info = data_barplot, sample.column = 1)
+```
+
+
+## Univariate and Multivariate Cox Regression analysis
+
+The Cox proportional-hazards model (Cox, 1972) is essentially a regression model commonly used statistical in medical research for investigating the association between the survival time of patients and one or more predictor variables.
+
+In clinical investigations, there are many situations, where several known quantities (known as covariates), potentially affect patient prognosis.
+
+For instance, suppose two groups of patients are compared: those with and those without a specific genotype. If one of the groups also contains older individuals, any difference in survival may be attributable to genotype or age or indeed both. Hence, when investigating survival in relation to any one factor, it is often desirable to adjust for the impact of others.
+
+Statistical model is a frequently used tool that allows to analyze survival with respect to several factors simultaneously. Additionally, statistical model provides the effect size for each factor.
+
+The cox proportional-hazards model is one of the most important methods used for modelling survival analysis data. The next section introduces the basics of the Cox regression model.
+
+References: 
+http://www.sthda.com/english/wiki/cox-proportional-hazards-model
+
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2394262/
+
+
+
+```{r fig.height=10, fig.width=8}
+library(dplyr)
+library(survival)
+# Univariate Cox
+#Cox univariate analysis estimated the impact on survival of each cell type.
+#For this, it is necessary to have the survival time of each patient and the event variable (in this case, death) and provide this information as input to the surv() function.
+
+# Prepare the survival object
+surv_object <- Surv(time = forest_data$OS.time, event = forest_data$OS)
+
+# Replace spaces with underscores in column names (immune cell types and clinical variables)
+#the gsub function will help us to replace the existing dots (.) in patient IDs to a dash (-).
+colnames(forest_data)[1:22] <- gsub(" ", "_", colnames(forest_data)[1:22])
+
+# Rename specific column if necessary
+colnames(forest_data)[9] <- "Treg"
+
+# Define the covariates for analysis
+covariates <- colnames(forest_data)[c(1:22, 27:29)]
+covariates
+
+# Function to create Cox model formulas by aggregating the column names that will be evaluated in the survival analysis by the surv() and coxph() function.
+univ_formulas <- sapply(covariates, function(x) as.formula(paste('surv_object ~', x)))
+
+# Apply Cox regression to each covariate using lapply function
+univ_models <- lapply(univ_formulas, function(x){coxph(x, data = forest_data)})
+
+# Extract important metrics from each Cox model (p-value, hazard ratios, confidence intervals) and format them.
+univ_results <- lapply(univ_models,
+                              function(x){ 
+                                x <- summary(x)
+                                p.value<-signif(x$wald["pvalue"], digits=2)
+                                wald.test<-signif(x$wald["test"], digits=2)
+                                beta<-signif(x$coef[1], digits=2);#coeficient beta
+                                
+                                HR <-signif(x$coef[2], digits=2);#exp(beta)
+                                HR.confint.lower <- signif(x$conf.int[,"lower .95"], 2)
+                                HR.confint.upper <- signif(x$conf.int[,"upper .95"],2)
+                                HR <- paste0(HR, " (", 
+                                             HR.confint.lower, "-", HR.confint.upper, ")")
+                                res<-c(beta, HR, wald.test, p.value)
+                                names(res)<-c("beta", "HR (95% CI for HR)", "wald.test", 
+                                              "p.value")
+                                return(res)
+                              })
+
+
+#Transform the list (univ_results) object into dataframe
+res_cox = as.data.frame(t(do.call(cbind, univ_results)))
+
+#Transform pvalue column into character and numeric
+res_cox$p.value <- as.character(res_cox$p.value)
+res_cox$p.value <- as.numeric(res_cox$p.value)
+
+### Lets visualize the results:
+# Convert individual univariate results to a data frame
+univ_results_df <- do.call(rbind, lapply(univ_models, function(model) {
+  model_sum <- summary(model)
+  term <- rownames(model_sum$coefficients)
+  HR <- exp(model_sum$coefficients[, "coef"])
+  lower_CI <- exp(model_sum$coefficients[, "coef"] - 1.96 * model_sum$coefficients[, "se(coef)"])
+  upper_CI <- exp(model_sum$coefficients[, "coef"] + 1.96 * model_sum$coefficients[, "se(coef)"])
+  p_value <- model_sum$coefficients[, "Pr(>|z|)"]
+  
+  data.frame(Term = term, HR = HR, lower_CI = lower_CI, upper_CI = upper_CI, p_value = p_value)
+}))
+
+# Adjusting the rownames
+rownames(univ_results_df) <- NULL
+
+
+# Add a column for formatted p-values
+univ_results_df$p_value_formatted <- ifelse(univ_results_df$p_value < 0.001, "< 0.001",
+                                            formatC(univ_results_df$p_value, format = "f", digits = 3))
+
+# Find the maximum x-value for positioning the p-values
+max_x_value <- max(log(univ_results_df$upper_CI))
+
+# Set an offset (adjust as needed based on your plot)
+offset <- 0.5
+
+# Creating the forest plot
+ggplot(univ_results_df, aes(x = log(HR), y = reorder(Term, log(HR)))) +
+  geom_point() +
+  geom_errorbarh(aes(xmin = log(lower_CI), xmax = log(upper_CI)), height = 0.2) +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  geom_text(aes(label = p_value_formatted, x = max_x_value + offset), hjust = 0, color = "blue") +
+  theme_minimal() +
+  labs(title = "Forest Plot of Univariate Cox Regression Results",
+       x = "Log Hazard Ratio",
+       y = "Variable") +
+  theme(axis.text.y = element_text(hjust = 1))
+
+```
+
+Multivariate Analysis
+
+```{r}
+#Now, we want to describe how the factors jointly impact on survival. To answer to this question, we’ll perform an statistical test called multivariate Cox regression analysis. For this, we select only the features that were significant in the univariate anaylis
+
+#Filtering Significant Results: You filter out results where the p-value is greater than 0.05.
+significant_results <- res_cox[which(res_cox$p.value <= 0.05),]
+
+#Check the immune cells that significantly impact each patient's survival (p val =<0.05)
+significant_results
+
+# Creating a formula for the multivariate analysis, combining significant factors
+f1 <- as.formula(paste("Surv(forest_data$OS.time, event = forest_data$OS) ~ ",
+                       paste(rownames(significant_results), collapse= "+")))
+# Performing multivariate Cox regression
+fit.coxph <- coxph(f1, data = forest_data)
+
+# Summarizing the multivariate Cox model
+summary(fit.coxph)
+
+#Lets Plot the Forest plot
+ggforest(fit.coxph, data = forest_data, main = "Hazard Ratio Melanoma Metastasis")
+```
