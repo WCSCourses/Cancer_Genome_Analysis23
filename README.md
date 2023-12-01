@@ -42,6 +42,7 @@ The course will be led by experts in cancer genomics from Latin America and the 
 - [Mutational Signature Analysis Slides](https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/Modules/Mutational_signature_analysis/MutSigs_WCSCGA2023_4.pdf)
 - [Mutational Signature Analysis Exercises](https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/Modules/Mutational_signature_analysis/MS_Practical_WCSCGA2023.md)
 - [Matrix file for Mutational Signature Analysis practical](https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/Modules/Mutational_signature_analysis/COREAD.SBS96.exome)
+- [RNA Deconvolution Slides](https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/Modules/RNA_Deconvolution/Data_Deconvolution/deconv_cibersort/Deconvolutional%20approaches%20to%20study%20the%20Tumor%20Microenviroment.pdf)
 - [RNA Deconvolution Exercises](https://htmlpreview.github.io/?https://github.com/WCSCourses/Cancer_Genome_Analysis23/blob/main/Modules/RNA_Deconvolution/Data_Deconvolution/deconv_cibersort/Exercise_cibersort_analysis.html)
 
 ## Other Presentations and Useful Files
